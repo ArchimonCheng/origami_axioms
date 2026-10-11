@@ -1,0 +1,2015 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>折纸公理演示 · 七条基本折法（GIF 导出）</title>
+<style>
+  :root{
+    --bg:#eef2f7; --card:#ffffff; --line:#dbe3ec; --line2:#c7d2df;
+    --text:#0f172a; --dim:#64748b;
+    --p1:#e5484d; --p2:#2563eb; --l1:#d97706; --l2:#0d9488; --crease:#7c3aed; --ok:#15803d;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:linear-gradient(180deg,#f7f9fc 0%, var(--bg) 100%);
+    color:var(--text);overflow:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{display:flex;height:100vh;width:100vw}
+  #stage{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;padding:16px}
+  canvas{display:block;border-radius:12px;background:#fff;box-shadow:0 10px 34px rgba(15,32,64,.12);cursor:grab;touch-action:none}
+  canvas.dragging{cursor:grabbing}
+  #panel{
+    width:352px;flex:none;padding:18px 18px 44px;overflow-y:auto;background:var(--card);
+    border-left:1px solid var(--line);box-shadow:-6px 0 24px rgba(15,32,64,.05);
+  }
+  #panel::-webkit-scrollbar{width:8px}
+  #panel::-webkit-scrollbar-thumb{background:#cfd8e3;border-radius:8px}
+  h1{margin:2px 0 6px;font-size:19px;letter-spacing:.4px}
+  h1 small{display:block;font-size:11px;color:var(--dim);font-weight:400;letter-spacing:1.6px;margin-top:5px}
+  p.sub{margin:0 0 12px;font-size:12.5px;line-height:1.75;color:#475569}
+  .card{background:#f7f9fc;border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:12px}
+  .card-t{font-size:11px;letter-spacing:1.4px;color:var(--dim);margin-bottom:7px}
+  ol{margin:0;padding-left:17px;font-size:12.5px;line-height:1.8;color:#3f4d63}
+  ol li{margin-bottom:5px}
+  .c-p1{color:var(--p1)}.c-par{color:#0d9488}.c-t{color:#db2777}.c-p2{color:var(--p2)}.c-l1{color:var(--l1)}.c-l2{color:var(--l2)}.c-cr{color:var(--crease)}
+  .row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  button{
+    flex:1;min-width:86px;padding:9px 8px;border-radius:9px;cursor:pointer;
+    border:1px solid var(--line2);background:#fff;color:var(--text);
+    font-size:12.5px;font-family:inherit;transition:.15s;
+  }
+  button:hover:not(:disabled){border-color:#94a3b8;background:#f8fafc}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  button.primary{background:linear-gradient(180deg,#3b82f6,#2563eb);border-color:#2563eb;color:#fff;font-weight:600}
+  button.primary:hover:not(:disabled){background:linear-gradient(180deg,#4b8ef8,#2f6ff0);border-color:#1d4ed8}
+  button.on{background:#fffbeb;border-color:#d9a92c;color:#92620a}
+  .seg{display:flex;gap:6px;margin-bottom:10px}
+  .seg button{flex:1;padding:7px 4px;font-size:12px}
+  label.lbl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--dim);margin:0 0 5px}
+  label.lbl b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;-webkit-appearance:none;height:4px;border-radius:3px;background:#dfe6ee;outline:none;margin:0 0 12px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:#7c3aed;border:2px solid #fff;box-shadow:0 1px 4px rgba(15,32,64,.3);cursor:pointer}
+  .checks{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;font-size:12px;color:#41506a;margin-bottom:12px}
+  .checks label{display:flex;align-items:center;gap:6px;cursor:pointer}
+  input[type=checkbox]{accent-color:#7c3aed;width:14px;height:14px;cursor:pointer}
+  .hint{font-size:11.5px;line-height:1.75;color:#7c8aa0;border-top:1px dashed var(--line);padding-top:10px;margin-top:4px}
+  #gifWrap{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+  #gifBtn{width:100%;font-weight:600;background:linear-gradient(180deg,#10b981,#059669);border-color:#059669;color:#fff}
+  #gifBtn:hover:not(:disabled){background:linear-gradient(180deg,#14c48d,#0aa376)}
+  .author{
+    margin:13px 0 2px;padding:8px 12px;border-radius:10px;text-align:center;
+    background:linear-gradient(180deg,#eef5fd,#e4eefb);border:1px solid #cfe0f2;
+    font-size:16px;font-weight:800;letter-spacing:.8px;color:#12457f;
+    font-variant-numeric:tabular-nums;user-select:all;
+  }
+  #prog{height:5px;border-radius:3px;background:#e6ecf3;overflow:hidden;margin-top:9px;display:none}
+  #prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#0d9488,#7c3aed);transition:width .15s}
+  #progTxt{font-size:11px;color:var(--dim);margin-top:6px;min-height:14px}
+  @media (max-width:900px){
+    #app{flex-direction:column}
+    #panel{width:100%;height:52%;border-left:none;border-top:1px solid var(--line)}
+    #stage{padding:8px}
+  }
+</style><style>
+  .axioms{display:flex;flex-direction:column;gap:6px}
+  .axioms button{display:flex;align-items:center;gap:8px;justify-content:flex-start;
+    text-align:left;padding:8px 10px;font-size:12.5px}
+  .axioms button b{font-size:14px;color:#7c3aed;flex:none}
+  .axioms button.on{background:#f5f3ff;border-color:#a78bfa;color:#5b21b6}
+  .axioms button.on b{color:#5b21b6}
+  .hint{min-height:44px}
+  button.danger{border-color:#f0c2c6;color:#b91c1c}
+  button.danger:hover:not(:disabled){border-color:#e5878e;background:#fff5f5}
+  button.danger:disabled{opacity:.4;cursor:not-allowed}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage"><canvas id="cv"></canvas></div>
+  <aside id="panel">
+    <h1>折纸公理演示<small>HUZITA'S 7 AXIOMS</small></h1>
+    <p class="sub">一张长方形纸，先在上面作点、作线，再按七条基本公理把它折起来。折过去的纸面透明度 40%，纸上的点会跟着走到对称位置。</p>
+
+    <div class="card">
+      <div class="card-t">基本操作</div>
+      <div class="row">
+        <button id="mSelect" class="on">🖱 选择</button>
+        <button id="mPoint">➕ 创建点</button>
+        <button id="mLine">╱ 创建线</button>
+      </div>
+      <div class="row">
+        <button id="undoBtn">↶ 撤销</button>
+        <button id="redoBtn">🔁 换一条解</button>
+        <button id="resetBtn">↺ 重置</button>
+      </div>
+      <div class="row">
+        <button id="delBtn" class="danger" disabled>🗑 删除选中</button>
+      </div>
+      <div class="row">
+        <button id="unfoldBtn">⬜ 展开纸面（保留折痕）</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-t">七条公理（点公理 → 按提示选对象）</div>
+      <div class="axioms" id="axiomList"></div>
+    </div>
+
+    <div class="hint" id="hint"></div>
+
+    <div class="checks">
+      <label><input type="checkbox" id="ckGrid">网格</label>
+      <label><input type="checkbox" id="ckWm" checked>背景水印</label>
+      <label><input type="checkbox" id="ckSnap" checked>吸附交点</label>
+      <label><input type="checkbox" id="ckFixed" checked>新点/线固定</label>
+      <label><input type="checkbox" id="ckFlat" checked>每次折在平纸上</label>
+      <label><input type="checkbox" id="ckMark" checked>显示象点</label>
+    </div>
+
+    <div class="row">
+      <button id="recBtn">● 录制步骤：关</button>
+    </div>
+
+    <div id="gifWrap">
+      <button id="gifBtn">🎬 导出动图 GIF</button>
+      <div class="author">zhihu:Archimon</div>
+      <div id="prog"><i></i></div>
+      <div id="progTxt"></div>
+    </div>
+  </aside>
+</div>
+
+<script>
+/* =========================================================================
+   一、几何基础
+   ========================================================================= */
+const V = {
+  add:(a,b)=>({x:a.x+b.x, y:a.y+b.y}),
+  sub:(a,b)=>({x:a.x-b.x, y:a.y-b.y}),
+  mul:(a,k)=>({x:a.x*k, y:a.y*k}),
+  dot:(a,b)=>a.x*b.x + a.y*b.y,
+  len:a=>Math.hypot(a.x,a.y),
+  norm(a){const l=Math.hypot(a.x,a.y)||1e-12; return {x:a.x/l, y:a.y/l};},
+  perp:a=>({x:-a.y, y:a.x}),
+  dist:(a,b)=>Math.hypot(a.x-b.x, a.y-b.y)
+};
+const makeLine   = (a,b) => ({a:{x:a.x,y:a.y}, b:{x:b.x,y:b.y}});
+/* 直线两种写法都支持：{a,b}（两点）或 {q,u}（点+方向） */
+const asRay      = L => L.u ? L : {q:L.a, u:V.norm(V.sub(L.b, L.a))};
+const lineDir    = L => V.norm(asRay(L).u);
+const lineNormal = L => V.perp(lineDir(L));
+const signedDist = (p, L) => V.dot(V.sub(p, asRay(L).q), lineNormal(L));
+
+/* 折痕/直线：q 上一点，u 单位方向，n 单位法向 */
+function mkRay(q, u){
+  const uu = V.norm(u);
+  return {q:{x:q.x, y:q.y}, u:uu, n:V.perp(uu)};
+}
+/* 直线交点 */
+function lineInt(A0, B0){
+  const A = asRay(A0), B = asRay(B0);
+  const u = V.norm(A.u), v = V.norm(B.u);
+  const den = u.x*v.y - u.y*v.x;
+  if (Math.abs(den) < 1e-9) return null;               // 平行
+  const w = V.sub(B.q, A.q);
+  const t = (w.x*v.y - w.y*v.x) / den;
+  return V.add(A.q, V.mul(u, t));
+}
+/* p₁p₂ 的中垂线 */
+function perpBisector(P1, P2){
+  const d = V.sub(P2, P1), len = V.len(d);
+  if (len < 1e-9) return null;
+  const n = V.mul(d, 1/len);
+  return {q:{x:(P1.x+P2.x)/2, y:(P1.y+P2.y)/2}, n, u:V.perp(n)};
+}
+/* 过 P 且垂直于 L 的直线（即「垂线折痕」） */
+function perpThrough(P, L){
+  return mkRay(P, V.perp(lineDir(L)));
+}
+/* 过 P 且平行于 L 的直线 */
+function parallelThrough(P, L){
+  return mkRay(P, lineDir(L));
+}
+/* 圆 (C,r) 与直线 L 的交点 */
+function circleLineInt(C, r, L0){
+  const L = asRay(L0);
+  const u = V.norm(L.u), n = V.perp(u);
+  const d = V.dot(V.sub(C, L.q), n);                   // 圆心到直线距离
+  if (Math.abs(d) > r + 1e-9) return [];
+  const a0 = V.sub(C, V.mul(n, d));                    // 弦中点
+  const h = Math.sqrt(Math.max(0, r*r - d*d));
+  const p1 = V.add(a0, V.mul(u,  h));
+  const p2 = V.add(a0, V.mul(u, -h));
+  return (h < 1e-6) ? [p1] : [p1, p2];
+}
+/* 两直线夹角平分线（两条） */
+function angleBisectors(L1, L2){
+  const O = lineInt(L1, L2);
+  if (!O) {                                            // 平行：中线
+    const u = lineDir(L1), n = V.perp(u);
+    const d1 = V.dot(V.sub(L1.a, L2.a), n);
+    return [mkRay(V.add(L2.a, V.mul(n, d1/2)), u)];
+  }
+  const u1 = lineDir(L1), u2 = lineDir(L2);
+  const out = [mkRay(O, V.add(u1, u2))];
+  const b = V.sub(u1, u2);
+  if (V.len(b) > .5) out.push(mkRay(O, b));
+  return out;
+}
+/* 关于直线 {q,n}（n 为单位法向）作镜像；theta=π 时即完全折过去 */
+function foldProj(p, c, theta){
+  const d = V.dot(V.sub(p, c.q), c.n);
+  const foot = V.sub(p, V.mul(c.n, d));
+  return V.add(foot, V.mul(c.n, d*Math.cos(theta)));
+}
+const reflectAcross = (p, c) => foldProj(p, c, Math.PI);
+const sideOf = (p, c) => V.dot(V.sub(p, c.q), c.n);
+
+/* 直线 / 凸多边形裁剪 */
+function clipLineToRect(a, u, r){
+  let s0 = -1e9, s1 = 1e9;
+  const p = [-u.x, u.x, -u.y, u.y];
+  const q = [a.x-r.x0, r.x1-a.x, a.y-r.y0, r.y1-a.y];
+  for (let i=0;i<4;i++){
+    if (Math.abs(p[i]) < 1e-12){ if (q[i] < 0) return null; }
+    else { const s = q[i]/p[i];
+      if (p[i] < 0){ if (s > s0) s0 = s; } else { if (s < s1) s1 = s; } }
+  }
+  return s0 > s1 ? null : [s0, s1];
+}
+function clipHalf(pts, q, n, keepPos){
+  const out = [], N = pts.length, f = p => V.dot(V.sub(p,q), n) * (keepPos ? 1 : -1);
+  for (let i=0;i<N;i++){
+    const A = pts[i], B = pts[(i+1)%N], fa = f(A), fb = f(B);
+    if (fa >= 0) out.push(A);
+    if ((fa >= 0) !== (fb >= 0)){
+      const s = fa/(fa-fb);
+      out.push({x:A.x+(B.x-A.x)*s, y:A.y+(B.y-A.y)*s});
+    }
+  }
+  return out;
+}
+function polyArea(p){
+  let a = 0;
+  for (let i=0;i<p.length;i++){ const q = p[(i+1)%p.length]; a += p[i].x*q.y - q.x*p[i].y; }
+  return Math.abs(a)/2;
+}
+function pointInPoly(p, poly){
+  let inside = false;
+  for (let i=0, j=poly.length-1;i<poly.length;j=i++){
+    const A = poly[i], B = poly[j];
+    if ((A.y > p.y) !== (B.y > p.y) &&
+        p.x < (B.x-A.x)*(p.y-A.y)/(B.y-A.y) + A.x) inside = !inside;
+  }
+  return inside;
+}
+/* 点到线段距离 */
+function distToSeg(p, A, B){
+  const d = V.sub(B,A), l2 = V.dot(d,d) || 1e-9;
+  const t = Math.max(0, Math.min(1, V.dot(V.sub(p,A), d)/l2));
+  return V.dist(p, {x:A.x+d.x*t, y:A.y+d.y*t});
+}
+/* 点到多边形边界的最小距离（在内部为 0） */
+function distToPolyEdge(p, poly){
+  if (pointInPoly(p, poly)) return 0;
+  let d = Infinity;
+  for (let i=0;i<poly.length;i++)
+    d = Math.min(d, distToSeg(p, poly[i], poly[(i+1)%poly.length]));
+  return d;
+}
+/* 命中某个面板（带容差，落在纸边/角上的点也能命中） */
+function panelAt(p, tol){
+  tol = (tol === undefined) ? 2.5 : tol;
+  let best = null;
+  for (const pn of S.panels){
+    if (pointInPoly(p, pn.poly) || distToPolyEdge(p, pn.poly) <= tol){
+      if (!best || (pn.z||0) > (best.z||0)) best = pn;
+    }
+  }
+  return best;
+}
+/* 线段 AB 与无限直线 r({q,u}) 的交点 */
+function segLineInt(A, B, r){
+  const d = V.sub(B,A), u = V.norm(r.u);
+  const den = d.x*u.y - d.y*u.x;
+  if (Math.abs(den) < 1e-9) return null;
+  const w = V.sub(r.q, A);
+  const t = (w.x*u.y - w.y*u.x)/den;
+  if (t < -1e-9 || t > 1+1e-9) return null;
+  return {x:A.x+d.x*t, y:A.y+d.y*t};
+}
+/* 线段 AB 与线段 CD 的交点 */
+function segSegInt(A, B, C, D){
+  const d1 = V.sub(B,A), d2 = V.sub(D,C);
+  const den = d1.x*d2.y - d1.y*d2.x;
+  if (Math.abs(den) < 1e-9) return null;
+  const w = V.sub(C,A);
+  const t = (w.x*d2.y - w.y*d2.x)/den;
+  const s = (w.x*d1.y - w.y*d1.x)/den;
+  if (t < -1e-9 || t > 1+1e-9 || s < -1e-9 || s > 1+1e-9) return null;
+  return {x:A.x+d1.x*t, y:A.y+d1.y*t};
+}
+/* 纸的边界线段（当前每个面板的每条边） */
+function paperEdges(){
+  const out = [];
+  for (const pn of S.panels){
+    for (let i=0;i<pn.poly.length;i++){
+      const A = pn.poly[i], B = pn.poly[(i+1)%pn.poly.length];
+      if (V.dist(A,B) > 2) out.push([A,B]);
+    }
+  }
+  return out;
+}
+/* 吸附候选点：直线×直线、直线×纸边、纸边×纸边 */
+function snapCandidates(){
+  const pts = [];
+  const push = p => {
+    if (!p) return;
+    if (p.x < -60 || p.x > W0+60 || p.y < -60 || p.y > H0+60) return;
+    for (const q of pts) if (V.dist(p,q) < .5) return;      // 去重
+    pts.push(p);
+  };
+  const rays = S.lines.map(L => asRay(L));
+  const edges = paperEdges();
+  /* 画面里保留下来的「象点」也可以作为吸附目标 */
+  if (S.showMarks) for (const mk of S.marks) push({x:mk.x, y:mk.y});
+  for (let i=0;i<rays.length;i++)
+    for (let j=i+1;j<rays.length;j++) push(lineInt(rays[i], rays[j]));
+  for (const r of rays) for (const e of edges) push(segLineInt(e[0], e[1], r));
+  for (let i=0;i<edges.length;i++)
+    for (let j=i+1;j<edges.length;j++) push(segSegInt(edges[i][0], edges[i][1], edges[j][0], edges[j][1]));
+  return pts;
+}
+/* 把平面上的点吸附到最近的交点（阈值内） */
+function snapPoint(p, R){
+  if (!S.snapOn) return {pt:p, hit:null};
+  const R2 = R || 16;
+  let best = null, bd = R2;
+  for (const q of snapCandidates()){
+    const d = V.dist(p, q);
+    if (d < bd){ bd = d; best = q; }
+  }
+  return best ? {pt:best, hit:best} : {pt:p, hit:null};
+}
+/* p₁′ 沿直线 L 滑动时的中垂线折痕（用于公理 5 / 6 的滑动搜索） */
+function creaseAtParam(P1, L, t){
+  const u = lineDir(L);
+  const pp = V.add(L.a, V.mul(u, t));
+  return perpBisector(P1, pp);
+}
+
+/* =========================================================================
+   二、GIF89a 编码器（调色板量化 + 变长 LZW，无第三方依赖）
+   ========================================================================= */
+function ByteWriter(){ this.buf = new Uint8Array(1<<16); this.len = 0; }
+ByteWriter.prototype._need = function(n){
+  if (this.len + n > this.buf.length){
+    let cap = this.buf.length * 2;
+    while (cap < this.len + n) cap *= 2;
+    const nb = new Uint8Array(cap);
+    nb.set(this.buf.subarray(0, this.len));
+    this.buf = nb;
+  }
+};
+ByteWriter.prototype.u8  = function(v){ this._need(1); this.buf[this.len++] = v & 255; };
+ByteWriter.prototype.u16 = function(v){ this.u8(v & 255); this.u8((v>>8) & 255); };
+ByteWriter.prototype.str = function(s){ for (let i=0;i<s.length;i++) this.u8(s.charCodeAt(i)); };
+ByteWriter.prototype.arr = function(a){ this._need(a.length); this.buf.set(a, this.len); this.len += a.length; };
+ByteWriter.prototype.out = function(){ return this.buf.subarray(0, this.len); };
+
+function lzwEncode(indices, minCodeSize){
+  const clearCode = 1 << minCodeSize, eoiCode = clearCode + 1;
+  const out = [];
+  let bitBuf = 0, bitCount = 0, codeSize = minCodeSize + 1, nextCode = eoiCode + 1;
+  let dict = new Map();
+  const emit = code => {
+    bitBuf |= code << bitCount;
+    bitCount += codeSize;
+    while (bitCount >= 8){ out.push(bitBuf & 255); bitBuf >>>= 8; bitCount -= 8; }
+  };
+  emit(clearCode);
+  if (!indices.length){ emit(eoiCode); if (bitCount) out.push(bitBuf & 255); return out; }
+  let prefix = indices[0];
+  for (let i=1;i<indices.length;i++){
+    const k = indices[i], key = (prefix << 8) | k;
+    const found = dict.get(key);
+    if (found !== undefined){ prefix = found; continue; }
+    emit(prefix);
+    if (nextCode < 4096){
+      dict.set(key, nextCode++);
+      if (nextCode > (1 << codeSize) && codeSize < 12) codeSize++;
+    } else {
+      emit(clearCode);
+      dict = new Map(); nextCode = eoiCode + 1; codeSize = minCodeSize + 1;
+    }
+    prefix = k;
+  }
+  emit(prefix);
+  emit(eoiCode);
+  if (bitCount) out.push(bitBuf & 255);
+  return out;
+}
+/* frames 里放「调色板索引」数组（未压缩），压缩与分块由本函数完成 */
+function writeGIF(w, h, frames, palette, delayCs, transIdx){
+  const o = new ByteWriter();
+  o.str('GIF89a');
+  o.u16(w); o.u16(h);
+  o.u8(0xF7); o.u8(0); o.u8(0);
+  for (let i=0;i<256;i++){
+    const c = palette[i] || [0,0,0];
+    o.u8(c[0]); o.u8(c[1]); o.u8(c[2]);
+  }
+  o.u8(0x21); o.u8(0xFF); o.u8(11); o.str('NETSCAPE2.0');
+  o.u8(3); o.u8(1); o.u16(0); o.u8(0);
+  for (const f of frames){
+    o.u8(0x21); o.u8(0xF9); o.u8(4);
+    o.u8(transIdx === null || transIdx === undefined ? 0x04 : 0x05);
+    o.u16(delayCs); o.u8(transIdx || 0); o.u8(0);
+    o.u8(0x2C); o.u16(0); o.u16(0); o.u16(w); o.u16(h); o.u8(0); o.u8(8);
+    const data = lzwEncode(f, 8);
+    for (let i=0;i<data.length;i+=255){
+      const n = Math.min(255, data.length - i);
+      o.u8(n); o.arr(data.slice(i, i+n));
+    }
+    o.u8(0);
+  }
+  o.u8(0x3B);
+  return o.out();
+}
+function hist15(data, hist){
+  for (let i=0;i<data.length;i+=4){
+    const q = ((data[i]>>3)<<10) | ((data[i+1]>>3)<<5) | (data[i+2]>>3);
+    hist[q]++;
+  }
+}
+function buildPalette(hist, nColors){
+  const N = Math.max(4, Math.min(256, nColors || 256));
+  const idx = [];
+  for (let q=0;q<32768;q++) if (hist[q]) idx.push(q);
+  idx.sort((a,b)=>hist[b]-hist[a]);
+  const pal = [];
+  for (let i=0;i<N;i++){
+    const q = idx[i];
+    if (q === undefined){ pal.push([0,0,0]); continue; }
+    pal.push([ ((q>>10)&31)*8+4, ((q>>5)&31)*8+4, (q&31)*8+4 ]);
+  }
+  if (!pal.length) pal.push([0,0,0]);
+  const lut = new Uint8Array(32768);
+  for (let q=0;q<32768;q++){
+    const r = ((q>>10)&31)*8+4, g = ((q>>5)&31)*8+4, b = (q&31)*8+4;
+    let best = 0, bd = Infinity;
+    for (let i=0;i<pal.length;i++){
+      const dr = r-pal[i][0], dg = g-pal[i][1], db = b-pal[i][2];
+      const d = dr*dr + dg*dg + db*db;
+      if (d < bd){ bd = d; best = i; if (!d) break; }
+    }
+    lut[q] = best;
+  }
+  return {pal, lut};
+}
+
+
+
+/* =========================================================================
+   三、纸张模型
+   -------------------------------------------------------------------------
+   纸 = 若干「面板」多边形（折叠会把面板按折痕切开、把翻折部分镜像）。
+   纸上的点：位于折痕「动侧」的点会随纸一起镜像。
+   ========================================================================= */
+const W0 = 960, H0 = 620;
+
+/* ---------- 平面 / 材料坐标的仿射变换 ----------
+   每个面板带一个等距变换 mat：把「纸上的材料坐标」映到「平面坐标」。
+   折叠时被翻折的面板 mat 再复合一次关于折痕的镜像，于是
+   · 纸上的点始终记在材料坐标里 —— 展开后自动回到原位；
+   · 折痕也记在材料坐标里 —— 展开后仍印在纸上。            */
+const IDENT = {a:1, b:0, c:0, d:1, tx:0, ty:0};
+const matApply = (M,p) => ({x: M.a*p.x + M.b*p.y + M.tx, y: M.c*p.x + M.d*p.y + M.ty});
+function matMul(A, B){                       // 先 B 后 A
+  return { a: A.a*B.a + A.b*B.c,  b: A.a*B.b + A.b*B.d,
+           c: A.c*B.a + A.d*B.c,  d: A.c*B.b + A.d*B.d,
+           tx: A.a*B.tx + A.b*B.ty + A.tx,
+           ty: A.c*B.tx + A.d*B.ty + A.ty };
+}
+const matInv = M => ({a:M.a, b:M.c, c:M.b, d:M.d,
+                      tx:-(M.a*M.tx + M.c*M.ty), ty:-(M.b*M.tx + M.d*M.ty)});
+function reflMat(q, n){
+  const k = 2*(q.x*n.x + q.y*n.y);
+  return { a:1-2*n.x*n.x, b:-2*n.x*n.y, c:-2*n.x*n.y, d:1-2*n.y*n.y, tx:k*n.x, ty:k*n.y };
+}
+const FRAME = {x0:0, y0:0, x1:W0, y1:H0};
+const PAPER0 = {x:290, y:140, w:380, h:320};        // 长方形纸张
+const FOLD_ALPHA = 0.4;                             // 翻折后的透明度 40%
+
+const S = {
+  panels: [], points: [], lines: [], creases: [],
+  mode: 'select',            // select | point | line
+  axiom: -1, picked: [],
+  hint: '', msg: '',
+  dragLine: null,            // 正在拖拽画线
+  seqP: 0, seqL: 0,
+  showGrid: false, showWm: true, snapOn: true,
+  newFixed: true,          // 新建的点/线是否作为「固定参照对象」（不随折叠移动）
+  snapDraw: null,
+  marks: [],                 // 翻折产生的象点（固定在平面上，仅作显示/吸附用）
+  rec: {on:false, steps:[]},  // 连续步骤录制
+  stepCaption: null,          // 当前步骤说明（录制回放时显示，会进 GIF）
+  showMarks: true,
+  last: null,                // 最近一次演示（用于导出 gif）
+  busy: false
+};
+const paperRectPts = () => [
+  {x:PAPER0.x, y:PAPER0.y}, {x:PAPER0.x+PAPER0.w, y:PAPER0.y},
+  {x:PAPER0.x+PAPER0.w, y:PAPER0.y+PAPER0.h}, {x:PAPER0.x, y:PAPER0.y+PAPER0.h}
+];
+function resetPaper(){
+  S.panels = [{poly:paperRectPts(), mpoly:paperRectPts(), mat:{...IDENT}, alpha:1, z:0}];
+  S.points = []; S.lines = []; S.creases = []; S.marks = [];
+  S.picked = []; S.axiom = -1; S.seqP = 0; S.seqL = 0;
+  AN.fold = null; AN.playing = false; AN.stages = [];
+  S.last = null; setHint('');
+}
+/* 按折痕把面板切成「动」与「不动」两部分 */
+function splitForFold(crease, refPoint){
+  const sgn = Math.sign(sideOf(refPoint, crease)) || 1;
+  const mov = [], fix = [];
+  for (const pn of S.panels){
+    const A = clipHalf(pn.poly, crease.q, crease.n, sgn > 0);
+    const B = clipHalf(pn.poly, crease.q, crease.n, !(sgn > 0));
+    const invPn = matInv(pn.mat);
+    // 材料区域也要一并切开，否则动画期间折痕会被画到纸外面去
+    if (A.length > 2) mov.push({poly:A, alpha:pn.alpha, mat:pn.mat,
+                                mpoly: A.map(v => matApply(invPn, v))});
+    if (B.length > 2) fix.push({poly:B, alpha:pn.alpha, mat:pn.mat,
+                                mpoly: B.map(v => matApply(invPn, v))});
+  }
+  return {mov, fix, sgn};
+}
+const foldPointWith = (p, crease, sgn, th) =>
+  (sideOf(p, crease) * sgn <= 0) ? {x:p.x, y:p.y} : foldProj(p, crease, th);
+
+/* 落一次折：面板镜像（mat 同步复合），点与折痕都记在材料坐标里 */
+function commitFold(crease, refPoint){
+  const sgn = Math.sign(sideOf(refPoint, crease)) || 1;
+  const Rm = reflMat(crease.q, crease.n);
+  const zTop = S.panels.reduce((m,pn)=>Math.max(m, pn.z||0), 0) + 1;
+  const out = [];
+  let host = null;
+  for (const pn of S.panels){
+    const A = clipHalf(pn.poly, crease.q, crease.n, sgn > 0);        // 动侧（平面）
+    const B = clipHalf(pn.poly, crease.q, crease.n, !(sgn > 0));     // 不动侧（平面）
+    const invPn = matInv(pn.mat);
+    if (B.length > 2 && polyArea(B) > 1){
+      const np = { poly:B, mpoly: B.map(v => matApply(invPn, v)),    // 材料区域同样被裁开
+                   mat:pn.mat, alpha:pn.alpha, z:pn.z||0 };
+      out.push(np); if (!host) host = np;
+    }
+    if (A.length > 2 && polyArea(A) > 1){
+      out.push({ poly: A.map(v => matApply(Rm, v)),
+                 mpoly: A.map(v => matApply(invPn, v)),
+                 mat: matMul(Rm, pn.mat), alpha: FOLD_ALPHA, z: zTop });
+    }
+  }
+  if (!out.length) out.push({poly:paperRectPts(), mpoly:paperRectPts(), mat:{...IDENT}, alpha:1, z:0});
+  S.panels = out;
+  /* 「象点」只在真正有意义时才产生：
+     · 只有公理里被折的那个点是「固定参照点」时才记（它自己不随纸动，
+       所以它折过去落在哪里是本次构造的产物，值得标出来，例如公理⑤的 p₁′）；
+     · 纸上的点折叠后就是它自己移过去了，不另设象点；
+     · 落点若与已有点/已有象点重合，也不重复标。 */
+  if (refPoint && refPoint.fixed){
+    const idx = S.points.indexOf(refPoint);
+    if (idx >= 0){
+      const img = reflectAcross(refPoint, crease);
+      if (V.dist(refPoint, img) > 2 &&
+          !S.points.some(p => V.dist(p, img) < 3) &&
+          !S.marks.some(m => V.dist(m, img) < 3)){
+        S.marks.push({x:img.x, y:img.y, label:ptLabel(idx) + '′'});
+      }
+    }
+  }
+  /* 这条折痕是否真的切到了当前的纸（折痕落空时纸不会动） */
+function creaseCutsPaper(c){
+  if (!c) return false;
+  return S.panels.some(pn => {
+    let pos = false, neg = false;
+    for (const v of pn.poly){
+      const d = sideOf(v, c);
+      if (d > 0.5) pos = true; else if (d < -0.5) neg = true;
+    }
+    return pos && neg;
+  });
+}
+/* 折痕登记为可选择的直线对象：平面坐标用于选择/继续作公理，材料坐标用于展开 */
+  if (host){
+    const inv = matInv(host.mat);
+    S.lines.push({ crease:true,
+      ma: matApply(inv, {x:crease.q.x, y:crease.q.y}),
+      mb: matApply(inv, V.add(crease.q, crease.u)),
+      a: {x:crease.q.x, y:crease.q.y},
+      b: V.add(crease.q, crease.u) });
+    S.seqL++;
+  }
+  refreshPoints(); refreshCreases();
+}
+/* 点的平面位置 = 所在面板的 mat 作用于材料坐标 */
+function refreshPoints(){
+  S.points.forEach(pt => {
+    if (pt.fixed) return;                       // 参照点固定不动
+    let best = null;
+    for (const pn of S.panels)
+      if ((pointInPoly({x:pt.mx, y:pt.my}, pn.mpoly) ||
+           distToPolyEdge({x:pt.mx, y:pt.my}, pn.mpoly) <= 2.5) &&
+          (!best || (pn.z||0) > (best.z||0))) best = pn;
+    if (!best) best = S.panels[0];
+    const q = matApply(best.mat, {x:pt.mx, y:pt.my});
+    pt.x = q.x; pt.y = q.y;
+  });
+}
+/* 折痕对象在平面上的“基准直线”
+   —— 必须保持创建时那条（也就是当时的折痕轴），否则后续公理拿到的方向会被
+   折叠的复合变换旋转 90°，算出来的折痕就完全错了。
+   纸上的折痕“印记”仍旧按材料坐标逐层绘制（见 creaseSegments），不受影响。 */
+function refreshCreases(){
+  S.lines.forEach(L => {
+    if (!L.crease) return;
+    if (!L.a || !L.b){                       // 兜底：万一没有基准直线
+      L.a = matApply(S.panels[0].mat, L.ma);
+      L.b = matApply(S.panels[0].mat, L.mb);
+    }
+  });
+}
+/* 在纸面上加点（记材料坐标） */
+function addPoint(p, fixed){
+  if (fixed){                                    // 固定参照点：只记平面位置，永不随折叠移动
+    const pt = {x:p.x, y:p.y, fixed:true};
+    S.points.push(pt); S.seqP++;
+    return pt;
+  }
+  const best = panelAt(p, 3);                    // 纸上的点：允许落在纸边/纸角上
+  if (!best) return null;
+  const m = matApply(matInv(best.mat), p);
+  const pt = {x:p.x, y:p.y, mx:m.x, my:m.y};
+  S.points.push(pt); S.seqP++;
+  return pt;
+}
+/* 线段裁剪到凸多边形 */
+function clipSegToPoly(A, B, poly){
+  if (!A || !B || !poly || poly.length < 3) return null;
+  if (polyArea(poly) < 1) return null;                 // 退化成线/点的多边形：直接跳过
+  const d = V.sub(B,A);
+  let t0 = 0, t1 = 1;
+  let cx = 0, cy = 0;
+  poly.forEach(p => { cx += p.x; cy += p.y; });
+  const c = {x:cx/poly.length, y:cy/poly.length};
+  for (let i=0;i<poly.length;i++){
+    const P = poly[i], Q = poly[(i+1)%poly.length];
+    const e = V.sub(Q,P);
+    let n = {x:e.y, y:-e.x};
+    if (V.dot(V.sub(c,P), n) < 0) n = {x:-n.x, y:-n.y};
+    const den = V.dot(d, n), num = V.dot(V.sub(P, A), n);
+    /* f(t) = dot(A + t·d - P, n) = -num + t·den ≥ 0 表示在内部 */
+    if (Math.abs(den) < 1e-12){ if (num > 1e-9) return null; continue; }
+    const t = num/den;
+    if (den > 0){ if (t > t0) t0 = t; } else { if (t < t1) t1 = t; }
+    if (t0 > t1) return null;
+  }
+  return [{x:A.x+d.x*t0, y:A.y+d.y*t0}, {x:A.x+d.x*t1, y:A.y+d.y*t1}];
+}
+/* 折痕在平面上的可见线段（逐层裁剪；折叠动画时动侧一起转） */
+function creaseSegments(panels, fold){
+  const out = [];
+  for (const L of S.lines){
+    if (!L.crease) continue;
+    const dir = V.norm(V.sub(L.mb, L.ma));
+    const far = 4000;
+    const PA = V.sub(L.ma, V.mul(dir, far)), PB = V.add(L.ma, V.mul(dir, far));
+    for (const pn of panels){
+      if (!pn.mat || !pn.mpoly) continue;            // 防御：缺少材料信息的面板跳过
+      const s = clipSegToPoly(PA, PB, pn.mpoly);
+      if (!s) continue;
+      let A = matApply(pn.mat, s[0]), B = matApply(pn.mat, s[1]);
+      if (fold && pn.moving){ A = foldProj(A, fold.crease, fold.theta); B = foldProj(B, fold.crease, fold.theta); }
+      out.push([A, B, pn, L]);
+    }
+  }
+  return out;
+}
+/* 取「面积较小的一侧」内部的一点，作为翻折方向的参考 */
+function smallerSideRef(crease){
+  const R = paperRectPts();
+  const A = clipHalf(R, crease.q, crease.n, true);
+  const B = clipHalf(R, crease.q, crease.n, false);
+  const pick = polyArea(A) <= polyArea(B) ? A : B;
+  if (pick.length < 3) return {x:PAPER0.x+PAPER0.w/2, y:PAPER0.y+PAPER0.h/2};
+  let sx = 0, sy = 0;
+  for (const p of pick){ sx += p.x; sy += p.y; }
+  return {x:sx/pick.length, y:sy/pick.length};
+}
+const inPaper = p => !!panelAt(p, 3);   // 点在当前纸面（含折后形状、含纸边）上
+
+/* =========================================================================
+   四、动画引擎
+   ========================================================================= */
+const AN = { stages:[], i:0, t:0, playing:false, fold:null, onDone:null };
+const smooth = t => t*t*(3-2*t);
+const clamp = (v,a,b) => v<a?a:(v>b?b:v);
+function playStages(stages){
+  AN.stages = stages; AN.i = 0; AN.t = 0; AN.playing = true; AN.fold = null;
+  if (stages[0] && stages[0].setup) stages[0].setup();
+}
+function stepAnim(dt){
+  if (!AN.playing) return;
+  const st = AN.stages[AN.i];
+  if (!st){ AN.playing = false; return; }
+  AN.t = Math.min(1, AN.t + dt / st.dur);
+  if (AN.t >= 1){                                   // 本阶段结束
+    if (st.draw) st.draw(1);
+    if (st.end) st.end();
+    AN.i++;
+    AN.t = 0;
+    if (AN.i >= AN.stages.length){
+      AN.playing = false; AN.i = AN.stages.length - 1; AN.t = 1;
+      if (AN.onDone){ const f = AN.onDone; AN.onDone = null; f(); }
+    } else if (AN.stages[AN.i].setup) AN.stages[AN.i].setup();
+  } else if (st.draw){                              // 阶段进行中：逐帧推进
+    st.draw(AN.t);
+  }
+}
+/* 通用「折过去」阶段 */
+function foldStage(creaseFn, refPoint, dur){
+  return {
+    dur: dur || 1.15,
+    setup(){ AN.fold = {crease:creaseFn(), ref:refPoint, theta:0}; },
+    draw(k){ AN.fold.crease = creaseFn(); AN.fold.theta = Math.PI * smooth(k); },
+    end(){ const c = AN.fold.crease; AN.fold = null; commitFold(c, refPoint); }
+  };
+}
+/* 通用「画构造线」阶段 */
+function drawStage(dur, fn){ return {dur, draw:fn}; }
+
+/* =========================================================================
+   五、绘图
+   ========================================================================= */
+const FAMILY = '"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif';
+const COLOR = {
+  bg:'#ffffff', grid:'rgba(70,110,170,.09)', wm:'rgba(15,32,64,.085)',
+  paper:'#ffffff', paperEdge:'#b9c6d6', fold:'rgba(214,229,246,',
+  pt:'#e5484d', ptName:'#b91c1c', line:'#0d9488', lineName:'#0f766e',
+  crease:'#94a3b8', creaseNew:'#7c3aed', sel:'#2563eb',
+  help:'#db2777', text:'#0f172a', dim:'#64748b', ok:'#15803d', warn:'#b45309'
+};
+const WM_TEXT = 'Archimon@zhihu';
+let wmTile = null, wmPattern = null;
+function watermarkTile(){
+  if (wmTile) return wmTile;
+  const SZ = 300, c = document.createElement('canvas');
+  c.width = c.height = SZ;
+  const t = c.getContext('2d');
+  t.fillStyle = COLOR.wm; t.font = '600 18px ' + FAMILY;
+  t.textAlign = 'center'; t.textBaseline = 'middle';
+  t.translate(SZ/2, SZ/2); t.rotate(-Math.PI/6);
+  t.fillText(WM_TEXT, 0, 0);
+  wmTile = c; return c;
+}
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);     ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function text(ctx, str, x, y, col, size, align, weight, outline){
+  ctx.font = (weight||600)+' '+(size||13)+'px '+FAMILY;
+  ctx.textAlign = align||'left'; ctx.textBaseline = 'middle';
+  if (outline !== false){
+    ctx.lineWidth = 3.6; ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(255,255,255,.92)'; ctx.strokeText(str,x,y);
+  }
+  ctx.fillStyle = col; ctx.fillText(str,x,y);
+}
+function diamond(ctx,x,y,r,fill,ring,ringW){
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x, y-r); ctx.lineTo(x+r, y); ctx.lineTo(x, y+r); ctx.lineTo(x-r, y);
+  ctx.closePath();
+  ctx.fillStyle = fill; ctx.fill();
+  if (ring){ ctx.lineWidth = ringW||2.2; ctx.strokeStyle = ring; ctx.stroke(); }
+  ctx.restore();
+}
+function dot(ctx,x,y,r,fill,ring,ringW){
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fillStyle = fill; ctx.fill();
+  if (ring){ ctx.lineWidth = ringW||2.2; ctx.strokeStyle = ring; ctx.stroke(); }
+}
+function seg(ctx, A, B, color, width, dash, alpha){
+  ctx.save();
+  if (alpha !== undefined) ctx.globalAlpha = alpha;
+  ctx.setLineDash(dash||[]); ctx.lineCap = 'round';
+  ctx.strokeStyle = color; ctx.lineWidth = width;
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+  ctx.restore();
+}
+function drawInfLine(ctx, L, color, width, dash){
+  const s = clipLineToRect(L.a, lineDir(L), FRAME); if (!s) return null;
+  const u = lineDir(L);
+  ctx.save();
+  ctx.setLineDash(dash||[]); ctx.lineCap = 'round';
+  ctx.strokeStyle = color; ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(L.a.x+u.x*s[0], L.a.y+u.y*s[0]);
+  ctx.lineTo(L.a.x+u.x*s[1], L.a.y+u.y*s[1]);
+  ctx.stroke(); ctx.restore();
+  return s;
+}
+function drawInfRay(ctx, c, color, width, dash){
+  return drawInfLine(ctx, {a:c.q, b:V.add(c.q, c.u)}, color, width, dash);
+}
+function polyPath(ctx, pts){
+  ctx.beginPath();
+  pts.forEach((p,i)=> i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
+  ctx.closePath();
+}
+
+/* =========================================================================
+   六、场景绘制
+   ========================================================================= */
+function drawScene(ctx, W, H){
+  const sc = W / W0;
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle = COLOR.bg; ctx.fillRect(0,0,W,H);
+  ctx.setTransform(sc,0,0,sc,0,0);
+  if (S.showWm){
+    if (!wmPattern) wmPattern = ctx.createPattern(watermarkTile(), 'repeat');
+    ctx.fillStyle = wmPattern; ctx.fillRect(0,0,W0,H0);
+  }
+  ctx.setTransform(1,0,0,1,0,0);
+  if (S.showGrid){
+    ctx.strokeStyle = COLOR.grid; ctx.lineWidth = 1; ctx.beginPath();
+    const step = 40*sc;
+    for (let x=0;x<=W;x+=step){ const px = Math.round(x)+.5; ctx.moveTo(px,0); ctx.lineTo(px,H); }
+    for (let y=0;y<=H;y+=step){ const py = Math.round(y)+.5; ctx.moveTo(0,py); ctx.lineTo(W,py); }
+    ctx.stroke();
+  }
+  ctx.setTransform(sc,0,0,sc,0,0);
+
+  const fold = AN.fold;
+  /* ---- 1. 纸张 ---- */
+  let panels, foldSgn = 1;
+  if (fold){
+    const sp = splitForFold(fold.crease, fold.ref);
+    foldSgn = sp.sgn;
+    panels = sp.fix.concat(sp.mov.map(m => ({...m, alpha:1, moving:true})));
+  } else panels = S.panels;
+  panels = panels.slice().sort((a,b)=>(a.z||0)-(b.z||0));
+  for (const pn of panels){
+    const isMov = pn.moving;
+    const poly = isMov ? pn.poly.map(v => foldProj(v, fold.crease, fold.theta)) : pn.poly;
+    const al = isMov ? (1 - 0.6*Math.sin(fold.theta/2)) : (pn.alpha === undefined ? 1 : pn.alpha);
+    ctx.save();
+    ctx.shadowColor = 'rgba(15,32,64,.10)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 3;
+    polyPath(ctx, poly);
+    ctx.fillStyle = (al < 1) ? (COLOR.fold + al.toFixed(3) + ')') : COLOR.paper;
+    ctx.fill();
+    ctx.restore();
+    polyPath(ctx, poly);
+    ctx.lineWidth = 1.5; ctx.strokeStyle = COLOR.paperEdge; ctx.stroke();
+  }
+
+  /* ---- 2. 折痕：材料坐标逐层绘出可见段 ---- */
+  for (const s of creaseSegments(panels, fold))
+    seg(ctx, s[0], s[1], 'rgba(120,140,175,.95)', 1.7, [7,6]);
+
+  /* ---- 3. 直线（固定在平面上） ---- */
+  S.lines.forEach((L,i)=>{
+    if (L.crease) return;                    // 折痕走上面那套画法
+    drawInfLine(ctx, L, COLOR.line, 2.4);
+    const u = lineDir(L);
+    const s = clipLineToRect(L.a, u, FRAME);
+    if (s){
+      const f = 0.86, t0 = s[0] + (s[1]-s[0])*f;
+      const p = {x:L.a.x+u.x*t0, y:L.a.y+u.y*t0}, n = V.perp(u);
+      text(ctx, sub(i+1,'l'), p.x+n.x*18, p.y+n.y*18, COLOR.lineName, 15, 'center', 700);
+    }
+    if (S.picked.some(o => o.kind==='line' && o.idx===i)){
+      drawInfLine(ctx, L, COLOR.sel, 5, []);
+      drawInfLine(ctx, L, COLOR.line, 2.4);
+    }
+  });
+  /* 折痕的选中高亮 */
+  if (S.picked.some(o => o.kind==='line' && S.lines[o.idx] && S.lines[o.idx].crease)){
+    const sel = S.picked.filter(o => o.kind==='line' && S.lines[o.idx] && S.lines[o.idx].crease)
+                        .map(o => S.lines[o.idx]);
+    for (const s of creaseSegments(panels, fold)){
+      if (!sel.includes(s[3])) continue;
+      seg(ctx, s[0], s[1], 'rgba(37,99,235,.55)', 6, []);
+    }
+  }
+
+  /* ---- 4. 点（翻折时跟随纸面） ---- */
+  const pts = S.points.map(p => (fold && !p.fixed) ? foldPointWith(p, fold.crease, foldSgn, fold.theta) : p);
+  S.points.forEach((p,i)=>{
+    const q = pts[i];
+    const picked = S.picked.some(o => o.kind==='point' && o.idx===i);
+    if (picked){
+      if (p.fixed) diamond(ctx, q.x, q.y, 17, 'rgba(37,99,235,.16)', COLOR.sel, 2);
+      else dot(ctx, q.x, q.y, 15, 'rgba(37,99,235,.16)', COLOR.sel, 2);
+    }
+    if (p.fixed) diamond(ctx, q.x, q.y, 9.5, COLOR.pt, '#fff', 2.4);   // 参照点：菱形
+    else         dot(ctx, q.x, q.y, 8, COLOR.pt, '#fff', 2.4);         // 纸上的点：圆点
+    text(ctx, ptLabel(i), q.x+15, q.y-16,
+         p.fixed ? '#7c2d12' : COLOR.ptName, 15, 'left', 700);
+  });
+
+  /* ---- 4b. 翻折产生的象点（被折的那个点折过去后落在哪里） ---- */
+  if (S.showMarks){
+    for (const mk of S.marks){
+      ring(ctx, mk.x, mk.y, 9, 'rgba(219,39,119,.85)', 2, [3,3]);
+      dot(ctx, mk.x, mk.y, 4.5, 'rgba(219,39,119,.95)', '#fff', 1.6);
+      text(ctx, mk.label, mk.x + 14, mk.y + 16, 'rgba(190,24,93,.95)', 13, 'left', 700);
+    }
+  }
+  /* ---- 5. 当前公理的构造动画 ---- */
+  if (S.con) S.con(ctx, S.conK);
+  if (S.slide){                                   // 公理 6：p₁′ 吸附在 l₁ 上滑动
+    const q = S.slide.pt;
+    if (S.slide.trail && S.slide.trail.length > 1){      // p₂ 落点的轨迹
+      ctx.save();
+      ctx.beginPath();
+      S.slide.trail.forEach((p,i)=> i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
+      ctx.setLineDash([6,5]); ctx.lineWidth = 1.8;
+      ctx.strokeStyle = 'rgba(37,99,235,.5)'; ctx.stroke();
+      ctx.restore();
+    }
+    if (S.slide.crease) drawInfRay(ctx, S.slide.crease, 'rgba(124,58,237,.85)', 2, [9,7]);
+    if (S.slide.from) ring(ctx, S.slide.from.x, S.slide.from.y, 9, 'rgba(219,39,119,.5)', 1.8, [4,4]);
+    ring(ctx, q.x, q.y, 12, 'rgba(219,39,119,.95)', 2.4, [5,4]);   // 只画圈，露出被折上来的 p₁
+    text(ctx, 'p₁′ 吸附在 l₁ 上滑动', q.x+18, q.y+22, COLOR.help, 13, 'left', 700);
+  }
+  /* ---- 吸附指示：交点上的十字圈 ---- */
+  if (S.snapDraw){
+    const q = S.snapDraw;
+    ring(ctx, q.x, q.y, 10, 'rgba(21,128,61,.95)', 2.2, [4,3]);
+    seg(ctx, {x:q.x-15,y:q.y}, {x:q.x+15,y:q.y}, 'rgba(21,128,61,.85)', 1.6);
+    seg(ctx, {x:q.x,y:q.y-15}, {x:q.x,y:q.y+15}, 'rgba(21,128,61,.85)', 1.6);
+    text(ctx, '吸附到交点', q.x+16, q.y+20, 'rgba(21,128,61,.95)', 12, 'left', 700);
+  }
+  drawHUD(ctx);
+}
+
+/* =========================================================================
+   七、HUD
+   ========================================================================= */
+function sub(n, pre){
+  const map = '₀₁₂₃₄₅₆₇₈₉';
+  return pre + String(n).split('').map(c=>map[+c]).join('');
+}
+/* 点用字母顺序编号：A,B,…,Z,AA,AB… （i 从 0 开始） */
+function ptLabel(i){
+  let s = '';
+  i = Math.max(0, i|0);
+  do { s = String.fromCharCode(65 + (i % 26)) + s; i = Math.floor(i / 26) - 1; } while (i >= 0);
+  return s;
+}
+function drawHUD(ctx){
+  ctx.save();
+  ctx.shadowColor = 'rgba(15,32,64,.10)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 3;
+  roundRect(ctx, 20, 16, 520, 76, 12);
+  ctx.fillStyle = 'rgba(255,255,255,.93)'; ctx.fill();
+  ctx.restore();
+  roundRect(ctx, 20, 16, 520, 76, 12);
+  ctx.strokeStyle = 'rgba(15,32,64,.10)'; ctx.lineWidth = 1; ctx.stroke();
+  text(ctx, '折纸公理演示 · 七条基本折法', 38, 40, COLOR.text, 17, 'left', 700, false);
+  const msg = S.stepCaption || S.msg || (S.axiom >= 0 ? hintFor() : '先选公理，或直接用「加点上 / 加线」作图');
+  text(ctx, msg, 38, 66, S.stepCaption ? '#7c3aed' : (S.axiom >= 0 ? COLOR.help : COLOR.dim), 12.5, 'left', 600, false);
+
+  /* 右下：作者署名（会一起导出到 gif） */
+  const at = 'zhihu:Archimon';
+  ctx.font = '800 16px ' + FAMILY;
+  const aw = ctx.measureText(at).width;
+  const ax = W0 - 22 - aw, ay = H0 - 46;
+  ctx.save();
+  roundRect(ctx, ax-11, ay-13, aw+22, 26, 8);
+  ctx.fillStyle = 'rgba(255,255,255,.86)'; ctx.fill();
+  ctx.strokeStyle = 'rgba(18,69,127,.20)'; ctx.lineWidth = 1; ctx.stroke();
+  ctx.restore();
+  text(ctx, at, ax, ay, '#12457f', 16, 'left', 800, false);
+}
+function ring(ctx,x,y,r,stroke,w,dash){
+  ctx.save(); ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.setLineDash(dash||[]); ctx.lineWidth = w||2; ctx.strokeStyle = stroke; ctx.stroke();
+  ctx.restore();
+}
+function growSeg(ctx, A, B, k, color, w, dash){
+  const E = {x:A.x+(B.x-A.x)*clamp(k,0,1), y:A.y+(B.y-A.y)*clamp(k,0,1)};
+  seg(ctx, A, E, color, w, dash);
+}
+function growLine(ctx, c, k, color, w, half){
+  const h = (half||460) * clamp(k,0,1);
+  seg(ctx, {x:c.q.x-c.u.x*h, y:c.q.y-c.u.y*h}, {x:c.q.x+c.u.x*h, y:c.q.y+c.u.y*h}, color, w);
+}
+function growCircle(ctx, C, r, k, color, w, dash){
+  ctx.save();
+  ctx.setLineDash(dash||[]); ctx.lineWidth = w; ctx.strokeStyle = color;
+  ctx.beginPath(); ctx.arc(C.x, C.y, r, -Math.PI/2, -Math.PI/2 + Math.PI*2*clamp(k,0,1)); ctx.stroke();
+  ctx.restore();
+}
+
+/* =========================================================================
+   八、七条公理
+   ========================================================================= */
+function findFoot(P, L){                      // 点到直线的垂足
+  const n = lineNormal(L);
+  return V.sub(P, V.mul(n, V.dot(V.sub(P, L.a), n)));
+}
+/* 公理 6：在 l1 上任意取「第一个落点」p₁′(t0) 时，挑一个折起来好看的 */
+function pickT0(P1, l1, tStar){
+  const R = paperRectPts();
+  let best = null;
+  for (let off = -460; off <= 460; off += 20){
+    if (Math.abs(off) < 90) continue;
+    const t0 = tStar + off;
+    const c = creaseAtParam(P1, l1, t0);
+    if (!c) continue;
+    const pp = ptAt(l1, t0);
+    if (pp.x < 30 || pp.x > W0-30 || pp.y < 30 || pp.y > H0-30) continue;
+    const sgn = Math.sign(sideOf(P1, c)) || 1;
+    const mov = clipHalf(R, c.q, c.n, sgn > 0);
+    if (mov.length < 3) continue;
+    const frac = polyArea(mov) / polyArea(R);
+    if (frac < 0.15 || frac > 0.85) continue;
+    let ok = true;
+    for (const v of mov){
+      const q = reflectAcross(v, c);
+      if (q.x < -80 || q.x > W0+80 || q.y < -80 || q.y > H0+80){ ok = false; break; }
+    }
+    if (!ok) continue;
+    const sc = Math.abs(frac - 0.4)*3 + Math.abs(c.len - 300)/500 + Math.abs(off)/900;
+    if (!best || sc < best.sc) best = {t0, sc};
+  }
+  return best ? best.t0 : tStar - 300;
+}
+/* p₂ 在折痕滑动过程中的落点轨迹（展示它一步步被送到 l₂ 上） */
+function slideTrail(P1, P2, l1, t0, t, n){
+  const pts = [];
+  for (let i=0;i<=n;i++){
+    const tt = t0 + (t - t0) * i / n;
+    const c = creaseAtParam(P1, l1, tt);
+    if (!c) continue;
+    const sgn = Math.sign(sideOf(P1, c)) || 1;
+    pts.push(sideOf(P2, c) * sgn > 0 ? reflectAcross(P2, c) : {x:P2.x, y:P2.y});
+  }
+  return pts;
+}
+
+/* 公理 6 用的滑动求解：p₁′ 沿 l1 滑动，直到 p₂ 折后落在 l2 上 */
+function solveSlide(P1, P2, l1, l2){
+  const u = lineDir(l1);
+  const f = t => {
+    const c = creaseAtParam(P1, l1, t);
+    if (!c) return NaN;
+    const img = reflectAcross(P2, c);
+    return signedDist(img, l2);
+  };
+  const sameSideOK = t => {
+    const c = creaseAtParam(P1, l1, t);
+    if (!c) return false;
+    return sideOf(P1,c) * sideOf(P2,c) > 1;    // p₁ p₂ 必须在折痕同侧才折得动
+  };
+  const R = 1800, step = 4, roots = [];
+  let pt = null, pf = null;
+  for (let t = -R; t <= R + 1e-9; t += step){
+    const v = f(t);
+    if (pf !== null && isFinite(pf) && isFinite(v)){
+      if (pf * v < 0){
+        let lo = pt, hi = t, fl = pf;
+        for (let i=0;i<70;i++){
+          const m = (lo+hi)/2, fm = f(m);
+          if (!isFinite(fm)) break;
+          if (fl*fm <= 0) hi = m; else { lo = m; fl = fm; }
+        }
+        const rt = (lo+hi)/2;
+        if (sameSideOK(rt) && Math.abs(f(rt)) < .8){
+          if (!roots.some(r => Math.abs(r-t) < .5)) roots.push(rt);
+        }
+      }
+    }
+    pt = t; pf = v;
+  }
+  return roots.sort((a,b)=>Math.abs(a)-Math.abs(b));
+}
+const ptAt = (L, t) => V.add(L.a, V.mul(lineDir(L), t));
+
+const AXIOMS = [
+/* ① 折点到点 */
+{ name:'点折到点', need:['point','point'],
+  desc:'折痕是两点连线的中垂线，把第一个点折到第二个点上',
+  run(sel){
+    const [A,B] = sel;
+    const c = perpBisector(A, B);
+    if (!c) return null;
+    const mid = c.q;
+    return { creases:[c], refs:[A],
+      con(ctx,k){
+        growSeg(ctx, A, B, clamp(k*1.7,0,1), COLOR.help, 2, [7,6]);
+        if (k > 0.6){
+          dot(ctx, mid.x, mid.y, 4, '#fff', COLOR.help, 2);
+          growLine(ctx, c, (k-0.6)/0.4, COLOR.creaseNew, 2.6);
+        }
+        text(ctx, '中垂线 = 折痕', mid.x+16, mid.y-20, COLOR.creaseNew, 13, 'left', 700);
+      } };
+  } },
+/* ② 折痕过两点 */
+{ name:'折痕过两点', need:['point','point'],
+  desc:'折痕就是过这两点的直线',
+  run(sel){
+    const [A,B] = sel;
+    const c = mkRay(A, V.sub(B,A));
+    return { creases:[c], refs:[smallerSideRef(c)],
+      con(ctx,k){
+        growSeg(ctx, A, B, clamp(k*1.7,0,1), COLOR.help, 2, [7,6]);
+        if (k > 0.6) growLine(ctx, c, (k-0.6)/0.4, COLOR.creaseNew, 2.6);
+      } };
+  } },
+/* ③ 线折到线 */
+{ name:'线折到线', need:['line','line'],
+  desc:'折痕是两条直线的角平分线（平行时取中线）',
+  run(sel){
+    const [L1,L2] = sel;
+    const cs = angleBisectors(L1, L2);
+    const O = lineInt(L1, L2);
+    const refA = {x:(L1.a.x+L1.b.x)/2, y:(L1.a.y+L1.b.y)/2};
+    return { creases:cs, refs:cs.map(()=>refA),
+      con(ctx,k){
+        if (O) dot(ctx, O.x, O.y, 5, '#fff', COLOR.help, 2.2);
+        cs.forEach((c,i)=>{
+          const g = clamp((k - i*0.25) / 0.7, 0, 1);
+          if (g > 0) growLine(ctx, c, g, i ? 'rgba(124,58,237,.55)' : COLOR.creaseNew, 2.4);
+        });
+        if (O) text(ctx, '角平分线 = 折痕', O.x+18, O.y-18, COLOR.creaseNew, 13, 'left', 700);
+      } };
+  } },
+/* ④ 过点作垂线 */
+{ name:'过点作垂线', need:['point','line'],
+  desc:'折痕过该点且垂直于这条直线',
+  run(sel){
+    const [P,L] = sel;
+    const c = perpThrough(P, L);
+    const F = findFoot(P, L);
+    return { creases:[c], refs:[smallerSideRef(c)],
+      con(ctx,k){
+        growSeg(ctx, P, F, clamp(k*1.6,0,1), COLOR.help, 2, [7,6]);
+        if (k > 0.55){
+          dot(ctx, F.x, F.y, 4.5, '#fff', COLOR.help, 2);
+          growLine(ctx, c, (k-0.55)/0.45, COLOR.creaseNew, 2.6);
+        }
+        text(ctx, '过 p 且 ⊥ l', P.x+16, P.y-22, COLOR.creaseNew, 13, 'left', 700);
+      } };
+  } },
+/* ⑤ 点折到线（折痕过另一点） */
+{ name:'点折到线（过另一点）', need:['point','point','line'],
+  desc:'以 p₂ 为圆心、|p₁p₂| 为半径作圆，圆与直线的交点就是 p₁′',
+  run(sel){
+    const [P1,P2,L] = sel;
+    const r = V.dist(P1,P2);
+    let hits = circleLineInt(P2, r, L);
+    if (!hits.length) return null;
+    /* 交点若与 p₁ 重合，中垂线不存在（此时 p₁ 本来就在这条线上），剔除 */
+    const pairs = [];
+    hits.forEach(h => { const c = perpBisector(P1, h); if (c) pairs.push({h, c}); });
+    if (!pairs.length) return null;
+    hits = pairs.map(p => p.h);
+    const creases = pairs.map(p => p.c);
+    return { creases, refs:hits.map(()=>P1),
+      con(ctx,k){
+        growCircle(ctx, P2, r, clamp(k*1.5,0,1), 'rgba(219,39,119,.75)', 2, [7,6]);
+        if (k > 0.6){
+          hits.forEach(h => dot(ctx, h.x, h.y, 6.5, '#fff', COLOR.help, 2.4));
+          hits.forEach((h,i)=>{
+            const c = creases[i];
+            if (!c) return;
+            growLine(ctx, c, clamp((k-0.6)/0.4, 0, 1), i ? 'rgba(124,58,237,.5)' : COLOR.creaseNew, 2.4);
+          });
+          const h0 = hits[0];
+          text(ctx, 'p₁′', h0.x+14, h0.y+18, COLOR.help, 14, 'left', 700);
+          text(ctx, '圆 ∩ l₁ = p₁′ 的可能位置', P2.x, P2.y+r+20, COLOR.help, 13, 'center', 700);
+        } else {
+          text(ctx, '|p₂p₁| 不变 ⇒ p₁′ 在圆上', P2.x, P2.y+r+20, COLOR.help, 13, 'center', 700);
+        }
+      } };
+  } },
+/* ⑥ 两点分别折到两线 */
+{ name:'两点折到两线', need:['point','point','line','line'],
+  desc:'先随意折一次，再让 p₁′ 沿 l₁ 滑动，直到 p₂ 落到 l₂ 上',
+  run(sel){
+    const [P1,P2,l1,l2] = sel;
+    const roots = solveSlide(P1, P2, l1, l2);
+    if (!roots.length) return null;
+    const tStar = roots[0];
+    return { slide:true, t0:pickT0(P1, l1, tStar), tStar, P1, P2, l1,
+             creases:[creaseAtParam(P1,l1,tStar)], refs:[P1], con(ctx,k){ } };
+  } },
+/* ⑦ 垂直于 l₁ 的折痕把 p 折到 l₂ */
+{ name:'垂直折痕折点到线', need:['point','line','line'],
+  desc:'过 p 作 l₁ 的平行线交 l₂ 于 p′，再作 pp′ 的中垂线（它必垂直于 l₁）',
+  run(sel){
+    const [P,l1,l2] = sel;
+    const m = parallelThrough(P, l1);
+    const Q = lineInt(m, l2);
+    if (!Q) return null;
+    const c = perpBisector(P, Q);
+    if (!c) return null;
+    return { creases:[c], refs:[P],
+      con(ctx,k){
+        growLine(ctx, m, clamp(k*1.3,0,1), 'rgba(219,39,119,.75)', 2, 420);
+        if (k > 0.45){
+          dot(ctx, Q.x, Q.y, 6.5, '#fff', COLOR.help, 2.4);
+          growSeg(ctx, P, Q, clamp((k-0.45)/0.35,0,1), COLOR.help, 2, [7,6]);
+          text(ctx, 'p′', Q.x+14, Q.y-16, COLOR.help, 14, 'left', 700);
+        }
+        if (k > 0.8) growLine(ctx, c, (k-0.8)/0.2, COLOR.creaseNew, 2.6);
+        text(ctx, '过 p 作 l₁ 的平行线', P.x, P.y-40, COLOR.help, 13, 'center', 700);
+      } };
+  } }
+];
+const NEED_TXT = { point:'点', line:'直线' };
+function hintFor(){
+  if (S.axiom < 0) return '';
+  const ax = AXIOMS[S.axiom];
+  const need = ax.need.map(t=>NEED_TXT[t]);
+  const got = S.picked.map(o=>NEED_TXT[o.kind]);
+  const next = ax.need[S.picked.length];
+  if (!next) return '正在计算…';
+  return `公理 ${S.axiom+1}「${ax.name}」：请选择${need.join(' + ')}（已选 ${got.length}/${need.length}，下一个选「${NEED_TXT[next]}」）`;
+}
+
+/* =========================================================================
+   九、交互
+   ========================================================================= */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const stageEl = document.getElementById('stage');
+let dpr = 1, last = performance.now();
+let lastAction = null, solPref = 0;
+const undoStack = [];
+
+function resize(){
+  const r = stageEl.getBoundingClientRect(), ar = W0/H0;
+  let w = Math.max(240, r.width), h = Math.max(160, r.height);
+  if (w/h > ar) w = h*ar; else h = w/ar;
+  cv.style.width = w+'px'; cv.style.height = h+'px';
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+}
+function draw(){ ctx.setTransform(1,0,0,1,0,0); drawScene(ctx, cv.width, cv.height); syncPickUI(); }
+const toWorld = e => {
+  const r = cv.getBoundingClientRect(), sc = r.width / W0;
+  return {x:(e.clientX - r.left)/sc, y:(e.clientY - r.top)/sc};
+};
+function snapshot(){
+  return JSON.stringify({panels:S.panels, points:S.points, lines:S.lines, creases:S.creases,
+                         marks:S.marks, seqP:S.seqP, seqL:S.seqL});
+}
+function restore(str){
+  const o = JSON.parse(str);
+  S.panels = o.panels; S.points = o.points; S.lines = o.lines; S.creases = o.creases;
+  S.seqP = o.seqP; S.seqL = o.seqL; S.marks = o.marks || [];
+  AN.fold = null; AN.playing = false; AN.stages = [];
+  S.con = null; S.slide = null; S.picked = []; S.axiom = -1;
+}
+function pushUndo(){ undoStack.push(snapshot()); if (undoStack.length > 80) undoStack.shift(); }
+/* 把某个点移动到平面位置（自动换算回材料坐标） */
+function movePointTo(pt, planePos){
+  const best = panelAt(planePos, 3);
+  if (!best) return false;
+  const m = matApply(matInv(best.mat), planePos);
+  pt.mx = m.x; pt.my = m.y; pt.x = planePos.x; pt.y = planePos.y;
+  return true;
+}
+/* 命中某个象点（画面里保留的） */
+function markAt(p, r){
+  let best = null, bd = (r || 12);
+  for (const mk of S.marks){
+    const d = V.dist(p, mk);
+    if (d < bd){ bd = d; best = mk; }
+  }
+  return best;
+}
+function hitPoint(p){
+  let bi = -1, bd = 18;
+  S.points.forEach((q,i)=>{ const d = V.dist(p,q); if (d < bd){ bd = d; bi = i; } });
+  return bi;
+}
+function hitLine(p){
+  let bi = -1, bd = 13;
+  const segs = creaseSegments(S.panels, AN.fold);
+  S.lines.forEach((L,i)=>{
+    if (L.crease){                                  // 折痕：按纸上可见的那几段判定
+      for (const s of segs){
+        if (s[3] !== L) continue;
+        const d = distToSeg(p, s[0], s[1]);
+        if (d < bd){ bd = d; bi = i; }
+      }
+      return;
+    }
+    const d = Math.abs(signedDist(p, L));
+    const u = lineDir(L);
+    const t = V.dot(V.sub(p, L.a), u);
+    const len = V.dist(L.a, L.b);
+    if (d < bd && t > -40 && t < len + 40){ bd = d; bi = i; }
+  });
+  return bi;
+}
+function setMode(m){
+  S.mode = m; S.picked = []; S.axiom = -1; S.msg = '';
+  document.getElementById('mSelect').classList.toggle('on', m==='select');
+  document.getElementById('mPoint').classList.toggle('on', m==='point');
+  document.getElementById('mLine').classList.toggle('on', m==='line');
+  setHint(m==='point' ? '在纸面上单击创建点' : m==='line' ? '在纸面上拖出一条直线' : '');
+  syncAxiomUI();
+}
+function setHint(t){ S.msg = t; }
+function syncAxiomUI(){
+  document.querySelectorAll('#axiomList button').forEach((b,i)=>{
+    b.classList.toggle('on', i === S.axiom);
+  });
+}
+function pickAxiom(i){
+  if (S.busy) return;
+  S.mode = 'select'; S.axiom = i; S.picked = []; S.msg = '';
+  document.getElementById('mSelect').classList.add('on');
+  document.getElementById('mPoint').classList.remove('on');
+  document.getElementById('mLine').classList.remove('on');
+  syncAxiomUI();
+  setHint(hintFor());
+}
+/* ---- 拖动 / 点击 ---- */
+let dragLine = null, dragPt = null;
+cv.addEventListener('pointerdown', e=>{
+  if (S.busy) return;
+  const p = toWorld(e);
+  if (S.mode === 'point'){
+    const sn = snapPoint(p);                       // 自动吸附到交点
+    if (!S.newFixed && !inPaper(sn.pt)){ setHint('请在纸面上创建点（或勾选「新点/线固定」）'); return; }
+    pushUndo();
+    addPoint(sn.pt, S.newFixed);
+    recHold('新建' + (S.newFixed ? '固定参照点 ' : '纸上的点 ') + ptLabel(S.points.length-1));
+    setHint((sn.hit ? '已吸附到交点，' : '') + '已创建' + (S.newFixed ? '固定参照点 ' : '纸上的点 ')
+            + ptLabel(S.points.length-1));
+    S.snapDraw = null;
+    return;
+  }
+  if (S.mode === 'line'){
+    dragLine = {a:p, b:p};
+    try { cv.setPointerCapture(e.pointerId); } catch(_){}
+    return;
+  }
+  /* 选择模式 */
+  if (S.axiom >= 0){
+    const ax = AXIOMS[S.axiom];
+    const needCount = t => ax.need.filter(x=>x===t).length;
+    const gotCount  = t => S.picked.filter(o=>o.kind===t).length;
+    const pi = hitPoint(p), li = pi < 0 ? hitLine(p) : -1;
+    let hit = null;
+    if (pi >= 0) hit = {kind:'point', idx:pi, obj:S.points[pi]};
+    else if (li >= 0) hit = {kind:'line', idx:li, obj:S.lines[li]};
+    if (!hit){ setHint(hintFor() + '（没点到对象）'); return; }
+    const dup = S.picked.findIndex(o=>o.kind===hit.kind && o.idx===hit.idx);
+    if (dup >= 0){ S.picked.splice(dup,1); setHint(hintFor()); return; }
+    if (gotCount(hit.kind) >= needCount(hit.kind)){ setHint('这类对象已经选够了：' + hintFor()); return; }
+    S.picked.push(hit);
+    if (S.picked.length >= ax.need.length) applyAxiom();
+    else setHint(hintFor());
+    return;
+  }
+  /* 未选公理时：点/线可多选；按住点拖动则可以移动它（带吸附） */
+  /* 直接点「象点」→ 就把它变成一个真正的点，方便继续作图 */
+  const mk = markAt(p, 12);
+  if (mk && hitPoint(p) < 0){
+    pushUndo();
+    const np = addPoint({x:mk.x, y:mk.y}, true);
+    S.marks.splice(S.marks.indexOf(mk), 1);
+    if (np) setHint('已把象点 ' + mk.label + ' 变成参照点 ' + ptLabel(S.points.length-1));
+    return;
+  }
+  const pi0 = hitPoint(p);
+  if (pi0 >= 0){
+    dragPt = {idx:pi0, start:p, moved:false};
+    try { cv.setPointerCapture(e.pointerId); } catch(_){}
+    return;
+  }
+  const li = hitLine(p);
+  if (li < 0){ S.picked = []; return; }
+  togglePick({kind:'line', idx:li});
+});
+function togglePick(hit){
+  const dup = S.picked.findIndex(o => o.kind===hit.kind && o.idx===hit.idx);
+  if (dup >= 0) S.picked.splice(dup,1);
+  else S.picked.push(hit);
+  setHint(S.picked.length ? '已选中 ' + S.picked.length + ' 个对象（Delete 删除）' : '');
+}
+cv.addEventListener('pointermove', e=>{
+  const p = toWorld(e);
+  if (dragLine){ dragLine.b = p; return; }
+  if (dragPt){
+    if (!dragPt.moved){
+      if (V.dist(p, dragPt.start) < 5) return;
+      dragPt.moved = true; pushUndo(); cv.classList.add('dragging');
+    }
+    const sn = snapPoint(p);
+    S.snapDraw = sn.hit;
+    const pt = S.points[dragPt.idx];
+    if (pt.fixed){ pt.x = sn.pt.x; pt.y = sn.pt.y; }   // 参照点直接移动
+    else movePointTo(pt, sn.pt);
+    return;
+  }
+  if (S.busy) return;
+  if (S.mode === 'point') S.snapDraw = snapPoint(p).hit;            // 加点模式：预览吸附
+  else if (S.mode === 'select'){                                    // 选择模式：象点上给反馈
+    const mk = S.showMarks ? markAt(p, 12) : null;
+    S.snapDraw = mk ? {x:mk.x, y:mk.y} : null;
+  } else S.snapDraw = null;
+  cv.style.cursor = (S.mode==='point' && inPaper(p)) ? 'crosshair'
+                  : (S.mode==='line') ? 'crosshair'
+                  : (hitPoint(p)>=0) ? 'grab'
+                  : (S.mode==='select' && S.showMarks && markAt(p,12)) ? 'copy'
+                  : (hitLine(p)>=0) ? 'pointer' : 'default';
+});
+const endDrag = ()=>{
+  if (dragPt){
+    if (!dragPt.moved) togglePick({kind:'point', idx:dragPt.idx});
+    else { setHint('已移动点 ' + ptLabel(dragPt.idx) + (S.snapDraw ? '（吸附到交点）' : '')); S.snapDraw = null; }
+    dragPt = null; cv.classList.remove('dragging');
+  }
+  if (dragLine){
+    const A = dragLine.a, B = dragLine.b;
+    if (V.dist(A,B) > 30 && V.dist(A,B) < 900){
+      pushUndo();
+      S.lines.push(makeLine(A,B)); S.seqL++;
+      recHold('新建直线 ' + sub(S.lines.length,'l'));
+      setHint('已创建直线 ' + sub(S.lines.length,'l'));
+    } else setHint('拖得太短了，请拖出一条直线');
+    dragLine = null;
+  }
+};
+cv.addEventListener('pointerup', endDrag);
+cv.addEventListener('pointercancel', endDrag);
+
+/* =========================================================================
+   十、执行公理
+   ========================================================================= */
+function foldStageFor(creaseFn, refPoint, dur){
+  return { dur: dur || 1.2,
+    setup(){ const c = creaseFn(); AN.fold = c ? {crease:c, ref:refPoint, theta:0} : null; },
+    draw(k){
+      const c = creaseFn();
+      if (!c){ AN.fold = null; return; }
+      AN.fold = {crease:c, ref:refPoint, theta:Math.PI*smooth(k)};
+    },
+    end(){ if (!AN.fold) return; const c = AN.fold.crease; AN.fold = null; commitFold(c, refPoint); } };
+}
+function buildStages(res, which){
+  const stages = [];
+  if (res.slide){
+    /* 公理 6 分两步：① 先随便取 p₁′，把 p₁ 折到它上面；② 让 p₁′ 沿 l₁ 滑动，
+       折痕跟着转，直到 p₂ 落到 l₂ 上。 */
+    const {t0, tStar, P1, P2, l1} = res;
+    stages.push({ dur:1.2,                                  // ① 第一次折：p₁ → p₁′(t0)
+      setup(){
+        const c0 = creaseAtParam(P1, l1, t0);
+        AN.fold = {crease:c0, ref:P1, theta:0};
+        S.slide = {pt:ptAt(l1, t0), crease:c0, trail:[]};
+      },
+      draw(k){
+        AN.fold.theta = Math.PI * smooth(k);
+        S.slide.crease = AN.fold.crease;
+      },
+      end(){ S.slide.crease = AN.fold.crease; } });
+    stages.push({ dur:2.4,                                  // ② 滑动折痕直到 p₂ 落到 l₂
+      setup(){},
+      draw(k){
+        const t = t0 + (tStar - t0) * smooth(k);
+        const c = creaseAtParam(P1, l1, t);
+        AN.fold = {crease:c, ref:P1, theta:Math.PI};
+        S.slide = {pt:ptAt(l1, t), crease:c, from:ptAt(l1, t0),
+                   trail:slideTrail(P1, P2, l1, t0, t, 42)};
+      },
+      end(){
+        const c = AN.fold.crease;
+        AN.fold = null; S.slide = null;
+        commitFold(c, P1);
+      } });
+  } else {
+    stages.push({ dur:1.7,                       // 构造动画（圆 / 平行线 / 角平分线…）
+      setup(){ S.con = res.con; S.conK = 0; },
+      draw(k){ S.conK = k; },
+      end(){ S.con = null; } });
+    const j = which % res.creases.length;
+    stages.push(foldStageFor(()=>res.creases[j], res.refs[j], 1.2));
+  }
+  return stages;
+}
+function applyAxiom(pref){
+  const ax = AXIOMS[S.axiom];
+  const objs = S.picked.map(o=>o.obj);
+  const picks = S.picked.map(o=>({kind:o.kind, idx:o.idx}));
+  const preSnap = snapshot();                 // 动作前的状态（撤销 / 导出重放都用它）
+  if (S.flattenFirst) flattenPaper();         // 每次折叠都作用在平整的纸面上
+  const res = ax.run(objs);
+  if (!res || !res.creases || !res.creases.length){
+    restore(preSnap);
+    setHint('这一组对象没有解：试着挪一挪位置或换一组对象');
+    S.picked = [];
+    return;
+  }
+  /* 兜底：剔除退化（null）的候选折痕，保持 creases / refs 对齐 */
+  {
+    const keep = [];
+    res.creases.forEach((c,i)=>{ if (c) keep.push(i); });
+    if (!keep.length){
+      restore(preSnap);
+      setHint('这一组对象没有解：试着挪一挪位置或换一组对象');
+      S.picked = [];
+      return;
+    }
+    if (keep.length !== res.creases.length){
+      res.creases = keep.map(i => res.creases[i]);
+      res.refs    = keep.map(i => res.refs[i]);
+    }
+  }
+  undoStack.push(preSnap);
+  if (undoStack.length > 80) undoStack.shift();
+  lastAction = {snap:preSnap, ax:S.axiom, picks, pref: pref || 0};
+  if (S.rec.on){
+    recPush({type:'axiom', snap:preSnap, ax:S.axiom, picks, pref: pref || 0});
+    S.stepCaption = '第 ' + S.rec.steps.length + ' 步 · 公理' + (S.axiom+1) + ' ' + ax.name;
+  }
+  solPref = pref || 0;
+  S.axiom = -1; syncAxiomUI();
+  S.picked = [];
+  S.busy = true;
+  const n = res.slide ? 1 : res.creases.length;
+  setHint('公理『' + ax.name + '』' + (n > 1 ? '：共 ' + n + ' 条折痕，演示第 ' + ((solPref%n)+1) + ' 条' : '：正在折…'));
+  playStages(buildStages(res, solPref));
+  AN.onDone = ()=>{ S.busy = false; setHint('折好了。可以继续选公理，或撤销重来。'); };
+}
+/* 换一条解：回到动作前重做 */
+function nextSolution(){
+  if (!lastAction){ setHint('还没有可切换的折痕'); return; }
+  restore(lastAction.snap);
+  const objs = lastAction.picks.map(p => p.kind==='point' ? S.points[p.idx] : S.lines[p.idx]);
+  const ax = AXIOMS[lastAction.ax];
+  const res = ax.run(objs);
+  if (!res) return;
+  const n = res.slide ? 1 : res.creases.length;
+  if (n <= 1){ setHint('这条公理只有一条折痕'); return; }
+  const pref = (lastAction.pref + 1) % n;
+  lastAction = {snap:lastAction.snap, ax:lastAction.ax, picks:lastAction.picks, pref};
+  lastAction.snap = snapshot();       // 已恢复到动作前状态，重新记录
+  S.busy = true;
+  setHint('切换到第 ' + (pref+1) + ' 条折痕');
+  playStages(buildStages(res, pref));
+  AN.onDone = ()=>{ S.busy = false; setHint('折好了。'); };
+}
+/* 删除选中的点 / 直线 */
+function deleteSelected(){
+  if (AN.playing || S.busy){ setHint('等动画结束再删除'); return; }
+  if (S.axiom >= 0){ setHint('正在为公理选择对象，先按 Esc 退出'); return; }
+  const objs = S.picked.filter(o=>o.kind==='point'||o.kind==='line');
+  if (!objs.length){ setHint('先点选要删除的点或直线'); return; }
+  pushUndo();
+  objs.filter(o=>o.kind==='line').map(o=>o.idx).sort((a,b)=>b-a)
+      .forEach(i=> S.lines.splice(i,1));
+  objs.filter(o=>o.kind==='point').map(o=>o.idx).sort((a,b)=>b-a)
+      .forEach(i=> S.points.splice(i,1));
+  const n = objs.length;
+  S.picked = [];
+  recHold('删除 ' + n + ' 个对象');
+  syncPickUI();
+  setHint('已删除 ' + n + ' 个对象（可用「撤销」恢复）');
+}
+/* ---------- 连续步骤录制 ---------- */
+function recPush(step){ S.rec.steps.push(step); syncRecUI(); }
+function recHold(label){ if (S.rec.on) recPush({type:'hold', snap:snapshot(), label:label||'操作'}); }
+function setRecording(on){
+  S.rec.on = on; S.rec.steps = []; S.stepCaption = null;
+  if (on) recHold('开始录制');                 // 记下起点
+  syncRecUI();
+  setHint(on ? '已开始录制：之后每一步操作都会被记下，点「导出动图 GIF」即输出整段过程'
+             : '已停止录制（已清空记录）');
+}
+function syncRecUI(){
+  const b = document.getElementById('recBtn');
+  if (!b) return;
+  b.textContent = S.rec.on ? '■ 录制步骤：开（' + Math.max(0, S.rec.steps.length-1) + ' 步）' : '● 录制步骤：关';
+  b.classList.toggle('on', S.rec.on);
+  const gb = document.getElementById('gifBtn');
+  if (gb) gb.textContent = (S.rec.on && S.rec.steps.length > 1)
+      ? '🎬 导出连续步骤 GIF（' + (S.rec.steps.length-1) + ' 步）' : '🎬 导出动图 GIF';
+}
+function syncPickUI(){
+  const b = document.getElementById('delBtn');
+  if (!b) return;
+  const n = S.picked.filter(o=>o.kind==='point'||o.kind==='line').length;
+  b.disabled = (n === 0) || S.axiom >= 0;
+  b.textContent = n ? '🗑 删除选中（' + n + '）' : '🗑 删除选中';
+}
+/* 展开纸面：纸恢复成整张长方形，折痕按材料坐标留在纸上 */
+function unfoldPaper(){
+  if (AN.playing || S.busy){ setHint('等动画结束再展开'); return; }
+  const folded = S.panels.length > 1 || (S.panels[0].alpha !== undefined && S.panels[0].alpha < 1);
+  if (!folded){ setHint('纸面本来就是平的'); return; }
+  pushUndo();
+  S.panels = [{poly:paperRectPts(), mpoly:paperRectPts(), mat:{...IDENT}, alpha:1, z:0}];
+  refreshPoints(); refreshCreases();
+  recHold('展开纸面（保留折痕）');
+  setHint('已展开纸面：折痕仍印在纸上（点也回到原位）');
+}
+function undo(){
+  if (AN.playing) return;
+  if (!undoStack.length){ setHint('没有可以撤销的操作'); return; }
+  restore(undoStack.pop());
+  recHold('撤销一步');
+  setHint('已撤销一步');
+}
+function resetAll(){
+  undoStack.length = 0;
+  resetPaper(); seedDemo();
+S.snapDraw = null;
+  setHint('已重置纸面');
+}
+
+/* =========================================================================
+   十一、启动与主循环
+   ========================================================================= */
+function tick(now){
+  const dt = Math.min(.05, (now - last)/1000); last = now;
+  if (!S.frozen) stepAnim(dt);
+  draw();
+  requestAnimationFrame(tick);
+}
+function seedDemo(){
+  S.points = [{x:600, y:395, mx:600, my:395}, {x:380, y:383, mx:380, my:383}]; S.seqP = 2;
+  S.lines = [makeLine({x:274, y:362}, {x:645, y:327}),
+             makeLine({x:426, y:160}, {x:483, y:440})]; S.seqL = 2;
+}
+function bootUI(){
+  const list = document.getElementById('axiomList');
+  const num = '①②③④⑤⑥⑦';
+  AXIOMS.forEach((ax,i)=>{
+    const b = document.createElement('button');
+    b.innerHTML = '<b>' + num[i] + '</b>' + ax.name;
+    b.title = ax.desc;
+    b.onclick = ()=> pickAxiom(i);
+    list.appendChild(b);
+  });
+  document.getElementById('mSelect').onclick = ()=> setMode('select');
+  document.getElementById('mPoint').onclick  = ()=> setMode('point');
+  document.getElementById('mLine').onclick   = ()=> setMode('line');
+  document.getElementById('undoBtn').onclick = undo;
+  document.getElementById('delBtn').onclick = deleteSelected;
+  document.getElementById('unfoldBtn').onclick = unfoldPaper;
+  document.getElementById('resetBtn').onclick = resetAll;
+  document.getElementById('redoBtn').onclick = nextSolution;
+  document.getElementById('ckGrid').onchange = e=> S.showGrid = e.target.checked;
+  document.getElementById('ckWm').onchange   = e=> S.showWm   = e.target.checked;
+  document.getElementById('ckSnap').onchange = e=>{ S.snapOn = e.target.checked; S.snapDraw = null; };
+  document.getElementById('ckFixed').onchange = e=>{ S.newFixed = e.target.checked; };
+  document.getElementById('ckFlat').onchange  = e=>{ S.flattenFirst = e.target.checked; };
+  document.getElementById('ckMark').onchange  = e=>{ S.showMarks = e.target.checked; };
+  document.getElementById('recBtn').onclick   = ()=> setRecording(!S.rec.on);
+  window.addEventListener('keydown', e=>{
+    if (e.key === 'z' && (e.metaKey||e.ctrlKey)){ e.preventDefault(); undo(); }
+    if (e.key === 'Escape'){ S.picked = []; S.axiom = -1; syncAxiomUI(); setHint(''); }
+    if (e.key === 'Delete' || e.key === 'Backspace'){ e.preventDefault(); deleteSelected(); }
+  });
+}
+window.addEventListener('resize', resize);
+resize();
+resetPaper();
+seedDemo();
+bootUI();
+syncRecUI();
+setMode('select');
+setHint('提示：默认新建的是「固定参照点/线」（菱形标记，不随折叠移动，相当于题目里给定的 p、l）；取消勾选则新建会跟着纸一起折的标记点。');
+S.last = null;
+AN.onDone = null;
+requestAnimationFrame(function loop(t){ last = t; tick(t); });
+
+/* =========================================================================
+   十二、导出 GIF
+   ========================================================================= */
+const G = {W:800, FPS:16, DUR:3.6, COLORS:96};
+G.H = Math.round(G.W * H0 / W0);
+const nextTick = ()=> new Promise(r=>setTimeout(r,0));
+
+/* 把动画推进（或回退）到绝对时刻 T —— 用于逐帧确定性导出 */
+function seekAnim(T){
+  AN.fold = null; AN.playing = false; S.con = null; S.slide = null;
+  const st = AN.stages;
+  if (!st.length) return;
+  if (st[0].setup) st[0].setup();
+  let acc = 0;
+  for (let i=0;i<st.length;i++){
+    const s = st[i];
+    if (T < acc + s.dur - 1e-9){
+      if (s.draw) s.draw(clamp((T-acc)/s.dur, 0, 1));
+      AN.i = i; AN.t = (T-acc)/s.dur;
+      return;
+    }
+    if (s.draw) s.draw(1);
+    acc += s.dur;
+    if (i+1 < st.length && st[i+1].setup) st[i+1].setup();
+    if (s.end) s.end();
+  }
+  AN.i = st.length-1; AN.t = 1;
+}
+/* 把录制的步骤编译成「可重放的段」：每段 = {snap, stages, dur} */
+function buildRecSequence(){
+  const seq = [];
+  const total = Math.max(0, S.rec.steps.length - 1);   // 第一步只是"开始"的基准
+  let k = 0;
+  for (const st of S.rec.steps){
+    if (st.type === 'axiom'){
+      k++;
+      const cap = '第 ' + k + '/' + total + ' 步 · 公理' + (st.ax+1) + ' ' + AXIOMS[st.ax].name;
+      restore(st.snap);
+      if (S.flattenFirst) flattenPaper();
+      const objs = st.picks.map(p => p.kind==='point' ? S.points[p.idx] : S.lines[p.idx]);
+      if (objs.some(o => !o)) continue;                       // 对象已被删掉就跳过
+      const res = AXIOMS[st.ax].run(objs);
+      if (!res || !res.creases || !res.creases.length) continue;
+      const keep = [];
+      res.creases.forEach((c,i)=>{ if (c) keep.push(i); });
+      if (!keep.length) continue;
+      if (keep.length !== res.creases.length){
+        res.creases = keep.map(i => res.creases[i]);
+        res.refs    = keep.map(i => res.refs[i]);
+      }
+      const stages = buildStages(res, st.pref || 0);
+      seq.push({snap:st.snap, stages, cap,
+                dur: stages.reduce((a,s)=>a+s.dur, 0) + 0.25});
+    } else {
+      if (k === 0) continue;                                  // 开头的"开始"基准不单独成段
+      k++;
+      seq.push({snap:st.snap, stages:[], cap:'第 ' + k + '/' + total + ' 步 · ' + (st.label || '操作'),
+                dur:0.65});                                   // 建点/建线/删除/展开：停一下
+    }
+  }
+  /* 末尾多停一会儿，方便看清结果 */
+  const last = seq[seq.length-1];
+  if (last) seq.push({snap:last.snap, stages:[], cap:last.cap + '（完成）', dur:1.6});
+  return seq;
+}
+/* 把重放推进到整段中的绝对时刻 T */
+function seekSeq(seq, T){
+  let acc = 0;
+  for (const seg of seq){
+    if (T < acc + seg.dur - 1e-9){
+      restore(seg.snap);
+      S.stepCaption = seg.cap || null;                  // 画面上标出这一步用的是什么公理
+      if (seg.stages.length){ AN.stages = seg.stages; seekAnim(T - acc); }
+      return;
+    }
+    acc += seg.dur;
+  }
+  const last = seq[seq.length - 1];
+  if (last){
+    restore(last.snap);
+    S.stepCaption = last.cap || null;
+    if (last.stages.length){ AN.stages = last.stages; seekAnim(last.dur); }
+  }
+}
+async function exportGIF(){
+  AN.playing = false; S.busy = false;          // 导出会自己重放，直接接管当前动画
+  /* 准备要演示的动作（没有的话就自动演示公理 ①） */
+  let act = lastAction;
+  if (!act){
+    if (S.points.length < 2){ setGifText('至少要有两个点才能演示'); return; }
+    const snap = snapshot();
+    act = {snap, ax:0, picks:[{kind:'point',idx:0},{kind:'point',idx:1}], pref:0};
+  }
+  const keep = snapshot();
+  S.busy = true;
+  const btn = document.getElementById('gifBtn');
+  const prog = document.getElementById('prog'), bar = prog.querySelector('i');
+  const ptxt = document.getElementById('progTxt');
+  const setP = (v,t)=>{ bar.style.width = (v*100).toFixed(1)+'%'; ptxt.textContent = t||''; };
+  const t0ms = performance.now();
+  btn.disabled = true; prog.style.display = 'block'; setP(0,'准备中…');
+  let seekTo, total, N, stepLabel;
+  try{
+    /* 录制模式 → 导出整段连续步骤；否则导出最近一次演示 */
+    const recSeq = (S.rec.on && S.rec.steps.length > 1) ? buildRecSequence() : null;
+    let stages = null;
+    if (recSeq && recSeq.length){
+      total = recSeq.reduce((a,s)=>a+s.dur, 0);
+      N = Math.max(2, Math.round(G.FPS * total));
+      stepLabel = '连续 ' + Math.max(0, S.rec.steps.length - 1) + ' 步';
+      seekTo = T => seekSeq(recSeq, T);
+    } else {
+      restore(act.snap);
+      if (S.flattenFirst) flattenPaper();
+      const objs = act.picks.map(p => p.kind==='point' ? S.points[p.idx] : S.lines[p.idx]);
+      if (objs.some(o => !o)) throw new Error('演示用到的对象已被删除');
+      const ax = AXIOMS[act.ax];
+      const res = ax.run(objs);
+      if (!res) throw new Error('该动作无法重放');
+      stages = buildStages(res, act.pref || 0);
+      AN.stages = stages;
+      total = stages.reduce((a,s)=>a+s.dur, 0);
+      N = Math.max(2, Math.round(G.FPS * total));
+      stepLabel = '单步演示';
+      seekTo = T => { restore(act.snap); if (S.flattenFirst) flattenPaper();
+                      AN.stages = stages; seekAnim(T); };
+    }
+    const off = document.createElement('canvas');
+    off.width = G.W; off.height = G.H;
+    const octx = off.getContext('2d', {willReadFrequently:true});
+
+    /* 第一遍：颜色直方图 */
+    const hist = new Uint32Array(32768);
+    for (let i=0;i<N;i++){
+      seekTo(total * i/(N-1));
+      drawScene(octx, G.W, G.H);
+      hist15(octx.getImageData(0,0,G.W,G.H).data, hist);
+      setP(i/N*0.42, '分析颜色… ' + (i+1) + '/' + N);
+      if (i % 4 === 0) await nextTick();
+    }
+    const {pal, lut} = buildPalette(hist, Math.min(G.COLORS, 255));
+    setP(0.45, '生成调色板…'); await nextTick();
+
+    /* 第二遍：量化 + 帧间差分 */
+    const TX = 255, NPX = G.W*G.H, frames = [];
+    let prevIdx = null;
+    for (let i=0;i<N;i++){
+      seekTo(total * i/(N-1));
+      drawScene(octx, G.W, G.H);
+      const src = octx.getImageData(0,0,G.W,G.H).data;
+      const idx = new Uint8Array(NPX);
+      for (let k=0,j=0;k<src.length;k+=4,j++)
+        idx[j] = lut[((src[k]>>3)<<10) | ((src[k+1]>>3)<<5) | (src[k+2]>>3)];
+      let outIdx = idx;
+      if (prevIdx){
+        outIdx = new Uint8Array(NPX);
+        for (let j=0;j<NPX;j++) outIdx[j] = (idx[j] === prevIdx[j]) ? TX : idx[j];
+      }
+      frames.push(outIdx); prevIdx = idx;
+      setP(0.45 + i/N*0.5, '压缩帧… ' + (i+1) + '/' + N);
+      await nextTick();
+    }
+    setP(0.97, '写入 GIF…'); await nextTick();
+    const bytes = writeGIF(G.W, G.H, frames, pal, Math.round(100/G.FPS), TX);
+    const blob = new Blob([bytes], {type:'image/gif'});
+    if (window.__noDownload){
+      let bin = '';
+      for (let i=0;i<bytes.length;i+=8192) bin += String.fromCharCode.apply(null, bytes.subarray(i,i+8192));
+      const el = document.createElement('pre');
+      el.id = 'gifout'; el.style.display = 'none';
+      el.textContent = btoa(bin);
+      document.body.appendChild(el);
+      document.title = 'GIF_READY';
+      setP(1, '已生成（测试模式，未下载）');
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'origami-axioms.gif';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    setP(1, '完成！已保存 origami-axioms.gif（' + stepLabel + ' · ' + N + ' 帧 · ' + (blob.size/1024).toFixed(0) + ' KB · 用时 '
+            + ((performance.now()-t0ms)/1000).toFixed(1) + ' s）');
+  } catch(err){
+    setP(0, '出错：' + err.message);
+    console.error(err);
+  } finally {
+    AN.fold = null; AN.playing = false; S.con = null; S.slide = null;
+    S.busy = false; btn.disabled = false;
+    if (!lastAction) restore(keep);
+  }
+}
+function setGifText(t){
+  document.getElementById('prog').style.display = 'block';
+  document.getElementById('progTxt').textContent = t;
+}
+document.getElementById('gifBtn').onclick = exportGIF;
+
+/* 调试参数：
+   ?axiom=n&picks=0,1,2   直接演示第 n 条公理（picks 依次为该公理需要的对象下标）
+   &at=0.5                把动画冻结在 50% 处（截图用）
+   ?gif=1&nodl=1          自动导出（测试模式） */
+(function(){
+  const qs = new URLSearchParams(location.search);
+  if (!qs.toString()) return;
+  if (qs.has('gif'))  window.__noDownload = qs.has('nodl');
+  if (qs.has('gifdur'))    G.DUR = Math.max(.4, parseFloat(qs.get('gifdur')) || G.DUR);
+  if (qs.has('giffps'))    G.FPS = Math.max(2, parseInt(qs.get('giffps'),10) || G.FPS);
+  if (qs.has('gifcolors')) G.COLORS = clamp(parseInt(qs.get('gifcolors'),10) || G.COLORS, 4, 256);
+  if (qs.has('gifw')){ G.W = parseInt(qs.get('gifw'),10) || G.W; G.H = Math.round(G.W*H0/W0); }
+  if (qs.has('wm'))    S.showWm   = qs.get('wm') !== '0';
+  if (qs.has('grid'))  S.showGrid = qs.get('grid') !== '0';
+  if (qs.has('axiom')){
+    const idx = clamp(parseInt(qs.get('axiom'),10)-1, 0, AXIOMS.length-1);
+    const need = AXIOMS[idx].need;
+    const nums = (qs.get('picks')||'').split(',').map(s=>parseInt(s,10));
+    S.axiom = idx; S.picked = [];
+    need.forEach((t,i)=>{
+      const v = isNaN(nums[i]) ? 0 : nums[i];
+      S.picked.push(t==='point' ? {kind:'point', idx:v, obj:S.points[v]}
+                                : {kind:'line',  idx:v, obj:S.lines[v]});
+    });
+    applyAxiom(0);
+    if (qs.has('at')){
+      S.busy = true;
+      const total = AN.stages.reduce((a,s)=>a+s.dur, 0);
+      seekAnim(total * clamp(parseFloat(qs.get('at'))||0, 0, 1));
+      AN.playing = false; S.frozen = true;
+    }
+  }
+  if (qs.has('noflat')) S.flattenFirst = false;      // 关闭「折叠前先摊平」，恢复真实多层折叠
+  if (qs.has('flaton')) S.flattenFirst = true;
+  if (qs.has('unfold')){ S.frozen = false; S.busy = false; AN.playing = false; unfoldPaper(); S.frozen = true; }
+  if (qs.has('delcrease')){
+    S.frozen = false; S.busy = false; AN.playing = false;
+    S.lines.forEach((L,i)=>{ if (L.crease) S.picked.push({kind:'line', idx:i}); });
+    deleteSelected(); S.frozen = true;
+  }
+  if (qs.has('rec')) setRecording(true);      // 录制模式（调试用：先开录制再跑 chain）
+  if (qs.has('chain')){                       // ?chain=1:0,1;5:0,1,2   依次执行多个公理
+    S.frozen = false;
+    qs.get('chain').split(';').forEach(st=>{
+      if (st === 'u' || st === 'U'){ unfoldPaper(); return; }        // 链中插入「展开」
+      if (st[0] === 'p'){                                            // 链中加点 p:x,y
+        const v = st.slice(st.indexOf(':')+1).split(',').map(Number);
+        const q = {x:v[0], y:v[1]};
+        const sn = snapPoint(q);
+        if (S.newFixed || inPaper(sn.pt)) addPoint(sn.pt, S.newFixed);
+        return;
+      }
+      if (st === 'A'){ S.frozen=false; S.busy=false; AN.playing=false; unfoldPaper(); return; }
+      const parts = st.split(':');
+      const idx = clamp(parseInt(parts[0],10)-1, 0, AXIOMS.length-1);
+      const nums = (parts[1]||'').split(',').map(x=>parseInt(x,10));
+      const need = AXIOMS[idx].need;
+      S.axiom = idx; S.picked = [];
+      need.forEach((t,i)=>{
+        const v = isNaN(nums[i]) ? 0 : nums[i];
+        const obj = t === 'point' ? S.points[v] : S.lines[v];
+        if (obj) S.picked.push({kind:t, idx:v, obj});
+      });
+      if (S.picked.length !== need.length) return;
+      applyAxiom(0);
+      const last = st === qs.get('chain').split(';').slice(-1)[0];
+      if (qs.has('anim') && last) return;            // 最后一步留着实时播放（复现用）
+      const total = AN.stages.reduce((a,s)=>a+s.dur, 0);
+      S.busy = true; seekAnim(total); AN.playing = false; S.busy = false;
+    });
+    if (!qs.has('anim')) S.frozen = true;
+  }
+  if (qs.has('forcefold')){          // 强制进入「已有折痕 + 正在折叠」的渲染状态（复现用）
+    const c = S.lines.filter(l=>l.crease)[0];
+    const u = V.norm(V.sub(c.b, c.a));
+    AN.fold = { crease:{q:{x:c.a.x,y:c.a.y}, u, n:V.perp(u)}, ref:S.points[0], theta:1.2 };
+    S.frozen = true;
+  }
+  if (qs.has('snapinfo') || qs.has('clickpt')){      // 调试：吸附候选 / 模拟加点
+    const parts = (qs.get('snapinfo') || qs.get('clickpt')).split(',').map(Number);
+    const p = {x:parts[0], y:parts[1]};
+    const sn = snapPoint(p);
+    if (qs.has('clickpt')){
+      S.mode = 'point';
+      (qs.get('clickpt')).split(';').forEach(tok=>{
+        const v = tok.split(',').map(Number), q = {x:v[0], y:v[1]};
+        const sn2 = snapPoint(q);
+        if (inPaper(sn2.pt)) addPoint(sn2.pt);
+      });
+    }
+    const pre = document.createElement('pre'); pre.id='probe'; pre.style.display='none';
+    pre.textContent = JSON.stringify({
+      cands: snapCandidates().map(c=>[+c.x.toFixed(1),+c.y.toFixed(1)]),
+      snapped: [+sn.pt.x.toFixed(2), +sn.pt.y.toFixed(2)],
+      hit: !!sn.hit,
+      points: S.points.map(q=>[+q.x.toFixed(2),+q.y.toFixed(2)])
+    });
+    document.body.appendChild(pre);
+    if (qs.has('show')) S.snapDraw = sn.hit;      // 截图用：把吸附指示显示出来
+    S.frozen = true;
+  }
+  if (qs.has('pick')){
+    (qs.get('pick')||'').split(',').forEach(tok=>{
+      const m = /^([pl])(\d+)$/.exec(tok.trim());
+      if (!m) return;
+      S.picked.push(m[1]==='p' ? {kind:'point', idx:+m[2]} : {kind:'line', idx:+m[2]});
+    });
+    if (qs.has('del')) deleteSelected(); else syncPickUI();
+  }
+  if (qs.has('gif') && !qs.has('pause')) exportGIF();
+})();
+
+</script>
+</body>
+</html>
